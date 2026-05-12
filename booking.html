@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đặt Tour – Khám Phá Huế</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <style>
+    /* ===== BOOKING PAGE STYLES ===== */
+    .booking-page {
+      min-height: 100vh;
+      background: var(--dark);
+      padding-top: 100px;
+      padding-bottom: 4rem;
+    }
+
+    .booking-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .booking-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .booking-header .section-label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .booking-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .booking-header p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ===== TOUR INFO CARD ===== */
+    .tour-info-card {
+      background: var(--dark3);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      position: sticky;
+      top: 100px;
+    }
+
+    .tour-info-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      filter: brightness(0.85);
+    }
+
+    .tour-info-body {
+      padding: 1.5rem;
+    }
+
+    .tour-info-body .tour-badge {
+      position: static;
+      display: inline-block;
+      margin-bottom: 0.8rem;
+    }
+
+    .tour-info-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--white);
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .tour-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.85rem;
+    }
+
+    .tour-detail-row:last-child { border-bottom: none; }
+
+    .tour-detail-row span:first-child { color: var(--gray); }
+    .tour-detail-row span:last-child { color: var(--white); font-weight: 500; }
+
+    .price-highlight {
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 4px;
+      padding: 1rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .price-highlight .label { font-size: 0.75rem; color: var(--gray); }
+    .price-highlight .amount {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--gold-light);
+      display: block;
+      margin-top: 0.2rem;
+    }
+
+    /* ===== FORM ===== */
+    .booking-form-wrap {
+      background: var(--dark3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 4px;
+      padding: 2rem;
+    }
+
+    .form-section-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--gold-light);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--white);
+      padding: 0.75rem 1rem;
+      border-radius: 2px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(136,136,136,0.6);
+    }
+
+    .form-group select option {
+      background: var(--dark2);
+      color: var(--white);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-error {
+      font-size: 0.75rem;
+      color: #e74c3c;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .form-group.error input,
+    .form-group.error select {
+      border-color: #e74c3c;
+    }
+
+    .form-group.error .form-error { display: block; }
+
+    /* Tổng tiền preview */
+    .price-preview {
+      background: var(--dark2);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      padding: 1.2rem;
+      margin: 1.5rem 0;
+    }
+
+    .price-preview-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-bottom: 0.5rem;
+    }
+
+    .price-preview-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      color: var(--white);
+      font-weight: 500;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 0.5rem;
+    }
+
+    .price-preview-total span:last-child {
+      color: var(--gold-light);
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 1rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-submit:disabled { background: var(--gray); cursor: not-allowed; transform: none; }
+
+    /* ===== SUCCESS PAGE ===== */
+    .success-page {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .success-page h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .success-page p {
+      color: var(--gray);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .booking-code {
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 400px;
+    }
+
+    .booking-code .label { font-size: 0.75rem; color: var(--gray); }
+    .booking-code .code {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: var(--gold-light);
+      display: block;
+      margin: 0.5rem 0;
+    }
+
+    .booking-code .total {
+      font-size: 0.9rem;
+      color: var(--white);
+    }
+
+    .success-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: var(--dark);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .booking-grid { grid-template-columns: 1fr; }
+      .tour-info-card { position: static; }
+      .form-row { grid-template-columns: 1fr; }
+      .booking-form-wrap { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar scrolled">
+    <div class="nav-logo">
+      <span class="logo-main">Huế</span>
+      <span class="logo-sub">Welcome to Hue City</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#featured">Điểm Đến</a></li>
+      <li><a href="index.html#all-tours">Tours</a></li>
+      <li><a href="index.html#why">Về Chúng Tôi</a></li>
+      <li><a href="booking.html" class="nav-cta">Đặt Tour</a></li>
+    </ul>
+  </nav>
+
+  <!-- ===== BOOKING PAGE ===== -->
+  <div class="booking-page">
+    <div class="booking-container">
+
+      <!-- Header -->
+      <div class="booking-header">
+        <p class="section-label">Đặt Tour Ngay</p>
+        <h1>Xác Nhận Hành Trình</h1>
+        <p>Điền thông tin bên dưới, chúng tôi sẽ liên hệ xác nhận trong vòng 2 giờ</p>
+      </div>
+
+      <!-- Main Content -->
+      <div id="bookingContent">
+        <div class="booking-grid">
+
+          <!-- Tour Info -->
+          <div class="tour-info-card">
+            <img id="tourImg" src="assets/images/anh_chinh.jpg" alt="Tour" />
+            <div class="tour-info-body">
+              <span class="tour-badge" id="tourBadge" style="display:none"></span>
+              <h3 id="tourTitle">Đang tải thông tin tour...</h3>
+              <div class="tour-detail-row">
+                <span>📍 Điểm đến</span>
+                <span id="tourDest">–</span>
+              </div>
+              <div class="tour-detail-row">
+                <span>⏱ Thời gian</span>
+                <span id="tourDuration">–</span>
+              </div>
+              <div class="tour-detail-row">
+                <span>👥 Tối đa</span>
+                <span id="tourMax">–</span>
+              </div>
+              <div class="price-highlight">
+                <div class="label">Giá người lớn</div>
+                <span class="amount" id="tourPrice">–</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="booking-form-wrap">
+            <form id="bookingForm" novalidate>
+
+              <!-- Thông tin cá nhân -->
+              <div class="form-section-title">👤 Thông Tin Khách Hàng</div>
+
+              <div class="form-group" id="grp-name">
+                <label>Họ và tên *</label>
+                <input type="text" id="full_name" placeholder="Nguyễn Văn A" />
+                <div class="form-error">Vui lòng nhập họ và tên</div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" id="grp-phone">
+                  <label>Số điện thoại *</label>
+                  <input type="tel" id="phone" placeholder="0901 234 567" />
+                  <div class="form-error">SĐT không hợp lệ (10 số)</div>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="email" placeholder="email@gmail.com" />
+                </div>
+              </div>
+
+              <!-- Thông tin chuyến đi -->
+              <div class="form-section-title" style="margin-top:1.5rem">🗓️ Thông Tin Chuyến Đi</div>
+
+              <div class="form-group" id="grp-date">
+                <label>Ngày khởi hành *</label>
+                <input type="date" id="departure_date" />
+                <div class="form-error">Vui lòng chọn ngày khởi hành (không được là ngày quá khứ)</div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" id="grp-adults">
+                  <label>Số người lớn *</label>
+                  <select id="num_adults">
+                    <option value="1">1 người</option>
+                    <option value="2">2 người</option>
+                    <option value="3">3 người</option>
+                    <option value="4">4 người</option>
+                    <option value="5">5 người</option>
+                    <option value="6">6 người</option>
+                    <option value="7">7 người</option>
+                    <option value="8">8 người</option>
+                    <option value="9">9 người</option>
+                    <option value="10">10 người</option>
+                  </select>
+                  <div class="form-error">Vui lòng chọn số người lớn</div>
+                </div>
+                <div class="form-group">
+                  <label>Số trẻ em (dưới 12 tuổi)</label>
+                  <select id="num_children">
+                    <option value="0">Không có</option>
+                    <option value="1">1 trẻ em</option>
+                    <option value="2">2 trẻ em</option>
+                    <option value="3">3 trẻ em</option>
+                    <option value="4">4 trẻ em</option>
+                    <option value="5">5 trẻ em</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Ghi chú thêm</label>
+                <textarea id="note" placeholder="Yêu cầu đặc biệt, dị ứng thức ăn, cần hỗ trợ gì..."></textarea>
+              </div>
+
+              <!-- Tổng tiền -->
+              <div class="price-preview">
+                <div class="price-preview-row">
+                  <span id="adultLabel">1 người lớn</span>
+                  <span id="adultTotal">–</span>
+                </div>
+                <div class="price-preview-row" id="childRow" style="display:none">
+                  <span id="childLabel">0 trẻ em (70%)</span>
+                  <span id="childTotal">–</span>
+                </div>
+                <div class="price-preview-total">
+                  <span>Tổng tiền ước tính</span>
+                  <span id="grandTotal">–</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-submit" id="submitBtn">
+                Xác Nhận Đặt Tour
+              </button>
+
+              <p style="text-align:center; font-size:0.75rem; color:var(--gray); margin-top:1rem;">
+                🔒 Thông tin của bạn được bảo mật tuyệt đối
+              </p>
+
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Success Page -->
+      <div class="success-page" id="successPage">
+        <div class="success-icon">🎉</div>
+        <h2>Đặt Tour Thành Công!</h2>
+        <p>Cảm ơn bạn đã tin tưởng chọn Huế Tour.</p>
+        <p>Chúng tôi sẽ liên hệ xác nhận trong vòng <strong style="color:var(--gold-light)">2 giờ</strong>.</p>
+
+        <div class="booking-code">
+          <div class="label">Mã đặt tour của bạn</div>
+          <span class="code" id="bookingCode">#000</span>
+          <div class="total">Tổng tiền: <strong id="bookingTotal" style="color:var(--gold-light)">–</strong></div>
+        </div>
+
+        <p style="color:var(--gray); font-size:0.85rem;">
+          📞 Hotline: <strong style="color:var(--white)">0234 567 890</strong> &nbsp;|&nbsp;
+          📧 <strong style="color:var(--white)">info@hue-tour.vn</strong>
+        </p>
+
+        <div class="success-actions">
+          <a href="index.html" class="btn-primary">← Về Trang Chủ</a>
+          <a href="index.html#all-tours" class="btn-outline">Xem Tour Khác</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  // ===== DỮ LIỆU TOUR (khớp với database Railway) =====
+  const TOURS = {
+    1: {
+      title: 'Cố Đô Huế Trọn Gói – Di Sản UNESCO',
+      destination: 'Đại Nội – Hoàng Thành',
+      duration: '3 ngày 2 đêm',
+      maxPeople: 20,
+      priceAdult: 2200000,
+      priceChild: 1540000,
+      badge: 'Bestseller',
+      badgeClass: '',
+      img: 'assets/images/langtam.png'
+    },
+    2: {
+      title: 'Thuyền Rồng Sông Hương – Ca Huế Hoàng Hôn',
+      destination: 'Sông Hương – Núi Ngự',
+      duration: '2 ngày 1 đêm',
+      maxPeople: 15,
+      priceAdult: 1500000,
+      priceChild: 1050000,
+      badge: 'Mới',
+      badgeClass: 'new',
+      img: 'assets/images/thuyen.jpg'
+    },
+    3: {
+      title: 'Khám Phá Ẩm Thực Cung Đình Huế',
+      destination: 'Phố Cổ – Chợ Đông Ba',
+      duration: '1 ngày 1 đêm',
+      maxPeople: 12,
+      priceAdult: 850000,
+      priceChild: 595000,
+      badge: null,
+      img: 'assets/images/amthuc.png'
+    },
+    4: {
+      title: 'Hành Trình Lăng Tẩm Triều Nguyễn',
+      destination: 'Lăng Tẩm – Ngoại Thành Huế',
+      duration: '2 ngày 1 đêm',
+      maxPeople: 18,
+      priceAdult: 1800000,
+      priceChild: 1260000,
+      badge: 'Bestseller',
+      badgeClass: '',
+      img: 'assets/images/langtamtrieunguyen.jpg'
+    },
+    5: {
+      title: 'Lăng Cô – Đèo Hải Vân – Bãi Biển Thiên Đường',
+      destination: 'Đèo Hải Vân – Bãi Biển Lăng Cô',
+      duration: '2 ngày 1 đêm',
+      maxPeople: 20,
+      priceAdult: 1650000,
+      priceChild: 1155000,
+      badge: null,
+      img: 'assets/images/langco.jpg'
+    },
+    6: {
+      title: 'Hành Hương Chùa Huế – Tâm Linh Cố Đô',
+      destination: 'Các Chùa Nổi Tiếng Huế',
+      duration: '1 ngày',
+      maxPeople: 25,
+      priceAdult: 650000,
+      priceChild: 455000,
+      badge: null,
+      img: 'assets/images/chuaHue.png'
+    },
+    7: {
+      title: 'Huế 1 Ngày – Tour Ghép Tiết Kiệm',
+      destination: 'Các Điểm Nổi Bật Huế',
+      duration: '1 ngày',
+      maxPeople: 30,
+      priceAdult: 490000,
+      priceChild: 343000,
+      badge: 'Giảm Giá',
+      badgeClass: 'sale',
+      img: 'assets/images/huednha.png'
+    },
+    8: {
+      title: 'Đêm Hoàng Cung – Ánh Sáng & Nghệ Thuật',
+      destination: 'Hoàng Thành Huế – Ban Đêm',
+      duration: '1 buổi tối',
+      maxPeople: 50,
+      priceAdult: 720000,
+      priceChild: 504000,
+      badge: 'Mới',
+      badgeClass: 'new',
+      img: 'assets/images/demhoagcung.jpg'
+    }
+  };
+
+  // ===== LẤY TOUR ID TỪ URL =====
+  const params  = new URLSearchParams(window.location.search);
+  const tourId  = parseInt(params.get('tour')) || 1;
+  const tour    = TOURS[tourId] || TOURS[1];
+
+  // ===== HIỂN THỊ THÔNG TIN TOUR =====
+  document.getElementById('tourImg').src       = tour.img;
+  document.getElementById('tourImg').alt       = tour.title;
+  document.getElementById('tourTitle').textContent  = tour.title;
+  document.getElementById('tourDest').textContent   = tour.destination;
+  document.getElementById('tourDuration').textContent = tour.duration;
+  document.getElementById('tourMax').textContent    = tour.maxPeople + ' người';
+  document.getElementById('tourPrice').textContent  = formatPrice(tour.priceAdult);
+  document.title = tour.title + ' – Đặt Tour Huế';
+
+  if (tour.badge) {
+    const badge = document.getElementById('tourBadge');
+    badge.textContent = tour.badge;
+    badge.style.display = 'inline-block';
+    if (tour.badgeClass === 'new') badge.classList.add('new');
+    if (tour.badgeClass === 'sale') badge.style.cssText += ';background:#e74c3c;color:#fff';
+  }
+
+  // Đặt ngày tối thiểu = ngày mai
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('departure_date').min = tomorrow.toISOString().split('T')[0];
+
+  // ===== TÍNH TIỀN =====
+  function formatPrice(n) {
+    return n.toLocaleString('vi-VN') + 'đ';
+  }
+
+  function updatePrice() {
+    const adults   = parseInt(document.getElementById('num_adults').value) || 1;
+    const children = parseInt(document.getElementById('num_children').value) || 0;
+
+    const adultTotal = tour.priceAdult * adults;
+    const childTotal = tour.priceChild * children;
+    const grand      = adultTotal + childTotal;
+
+    document.getElementById('adultLabel').textContent = adults + ' người lớn';
+    document.getElementById('adultTotal').textContent = formatPrice(adultTotal);
+
+    const childRow = document.getElementById('childRow');
+    if (children > 0) {
+      childRow.style.display = 'flex';
+      document.getElementById('childLabel').textContent = children + ' trẻ em (70%)';
+      document.getElementById('childTotal').textContent = formatPrice(childTotal);
+    } else {
+      childRow.style.display = 'none';
+    }
+
+    document.getElementById('grandTotal').textContent = formatPrice(grand);
+  }
+
+  document.getElementById('num_adults').addEventListener('change', updatePrice);
+  document.getElementById('num_children').addEventListener('change', updatePrice);
+  updatePrice();
+
+  // ===== VALIDATE =====
+  function validate() {
+    let ok = true;
+
+    const name  = document.getElementById('full_name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const date  = document.getElementById('departure_date').value;
+
+    // Tên
+    const grpName = document.getElementById('grp-name');
+    if (!name) { grpName.classList.add('error'); ok = false; }
+    else grpName.classList.remove('error');
+
+    // SĐT (10 số)
+    const grpPhone = document.getElementById('grp-phone');
+    if (!/^[0-9]{10}$/.test(phone.replace(/\s/g, ''))) {
+      grpPhone.classList.add('error'); ok = false;
+    } else grpPhone.classList.remove('error');
+
+    // Ngày
+    const grpDate = document.getElementById('grp-date');
+    if (!date || new Date(date) <= new Date()) {
+      grpDate.classList.add('error'); ok = false;
+    } else grpDate.classList.remove('error');
+
+    return ok;
+  }
+
+  // ===== SUBMIT FORM =====
+  document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Đang xử lý...';
+
+    const data = {
+      full_name:      document.getElementById('full_name').value.trim(),
+      phone:          document.getElementById('phone').value.trim().replace(/\s/g, ''),
+      email:          document.getElementById('email').value.trim(),
+      tour_id:        tourId,
+      departure_date: document.getElementById('departure_date').value,
+      num_adults:     parseInt(document.getElementById('num_adults').value),
+      num_children:   parseInt(document.getElementById('num_children').value),
+      note:           document.getElementById('note').value.trim()
+    };
+
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.booking_id) {
+        // Hiện trang thành công
+        document.getElementById('bookingContent').style.display = 'none';
+        const successPage = document.getElementById('successPage');
+        successPage.style.display = 'block';
+        document.getElementById('bookingCode').textContent = '#' + String(result.booking_id).padStart(4, '0');
+        document.getElementById('bookingTotal').textContent = formatPrice(result.total_price);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error(result.error || 'Lỗi không xác định');
+      }
+
+    } catch (err) {
+      alert('❌ Đặt tour thất bại: ' + err.message + '\nVui lòng thử lại hoặc liên hệ hotline 0234 567 890');
+      btn.disabled = false;
+      btn.innerHTML = 'Xác Nhận Đặt Tour';
+    }
+  });
+  </script>
+
+</body>
+</html>
