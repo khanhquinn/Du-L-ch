@@ -379,16 +379,21 @@
 
 <!-- ══ MODAL THÊM LỊCH ════════════════════════════════════ -->
 <div class="modal-overlay" id="addModal">
-  <div class="modal">
-    <h3 id="modalTitle">Thêm Lịch Tour</h3>
+  <div class="modal" style="width:520px">
+    <h3 id="modalTitle">Thêm Lịch / Khoá Ngày</h3>
+
+    <!-- Loại hành động -->
     <div class="form-group">
       <label>Loại</label>
       <select id="scheduleType" onchange="toggleScheduleType()">
-        <option value="tour">Lịch tour cụ thể</option>
-        <option value="block">Khoá ngày (không nhận khách)</option>
+        <option value="tour">📅 Thêm lịch 1 tour</option>
+        <option value="block-multi">🔒 Khoá nhiều tour cùng lúc</option>
+        <option value="block-all">🚫 Khoá tất cả tour trong ngày</option>
       </select>
     </div>
-    <div id="tourFields">
+
+    <!-- Chọn 1 tour -->
+    <div id="fieldOneTour">
       <div class="form-group">
         <label>Chọn Tour</label>
         <select id="scheduleTourId"></select>
@@ -398,17 +403,41 @@
         <input type="number" id="scheduleMax" value="20" min="1" max="100"/>
       </div>
     </div>
+
+    <!-- Chọn nhiều tour -->
+    <div id="fieldMultiTour" style="display:none">
+      <div class="form-group">
+        <label>Chọn các tour muốn khoá <span style="color:var(--gray);font-size:.7rem">(giữ Ctrl để chọn nhiều)</span></label>
+        <select id="scheduleMultiTourId" multiple style="height:120px;background:var(--dark2);border:1px solid rgba(255,255,255,.08);color:var(--white);padding:.5rem;border-radius:4px;width:100%;font-family:var(--font)"></select>
+      </div>
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+        <button type="button" onclick="selectAllTours()" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--gold);padding:.3rem .8rem;border-radius:3px;cursor:pointer;font-size:.75rem">Chọn tất cả</button>
+        <button type="button" onclick="deselectAllTours()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--gray);padding:.3rem .8rem;border-radius:3px;cursor:pointer;font-size:.75rem">Bỏ chọn</button>
+      </div>
+    </div>
+
+    <!-- Khoá tất cả - hiện thông báo -->
+    <div id="fieldBlockAll" style="display:none">
+      <div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:4px;padding:1rem;margin-bottom:1rem">
+        <p style="color:var(--red);font-size:.85rem">⚠️ Tất cả các tour trong ngày này sẽ bị khoá. Khách hàng sẽ không thể chọn ngày này.</p>
+      </div>
+    </div>
+
+    <!-- Ngày -->
     <div class="form-group">
       <label>Ngày</label>
       <input type="date" id="scheduleDate"/>
     </div>
+
+    <!-- Ghi chú / Lý do -->
     <div class="form-group">
       <label id="noteLabel">Ghi chú</label>
       <input type="text" id="scheduleNote" placeholder="Ghi chú tuỳ chọn..."/>
     </div>
+
     <div class="modal-footer">
       <button class="btn-modal-cancel" onclick="closeModal('addModal')">Huỷ</button>
-      <button class="btn-modal-save" onclick="saveSchedule()">Lưu</button>
+      <button class="btn-modal-save" id="btnSaveSchedule" onclick="saveSchedule()">Lưu</button>
     </div>
   </div>
 </div>
@@ -626,8 +655,14 @@ async function confirmCancel() {
 async function loadTours() {
   const res = await fetch('/api/tours');
   allTours  = await res.json();
-  const sel = document.getElementById('scheduleTourId');
-  sel.innerHTML = allTours.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+
+  // Dropdown chọn 1 tour
+  const sel1 = document.getElementById('scheduleTourId');
+  sel1.innerHTML = allTours.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+
+  // Dropdown chọn nhiều tour
+  const sel2 = document.getElementById('scheduleMultiTourId');
+  sel2.innerHTML = allTours.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
 }
 
 async function renderCalendar() {
@@ -706,33 +741,93 @@ function openAddModal() {
 
 function toggleScheduleType() {
   const type = document.getElementById('scheduleType').value;
-  document.getElementById('tourFields').style.display = type === 'tour' ? 'block' : 'none';
-  document.getElementById('noteLabel').textContent = type === 'block' ? 'Lý do khoá' : 'Ghi chú';
+  document.getElementById('fieldOneTour').style.display    = type === 'tour'         ? 'block' : 'none';
+  document.getElementById('fieldMultiTour').style.display  = type === 'block-multi'  ? 'block' : 'none';
+  document.getElementById('fieldBlockAll').style.display   = type === 'block-all'    ? 'block' : 'none';
+
+  const noteLabel = document.getElementById('noteLabel');
+  const saveBtn   = document.getElementById('btnSaveSchedule');
+
+  if (type === 'tour') {
+    noteLabel.textContent = 'Ghi chú';
+    saveBtn.style.background = 'var(--gold)';
+    saveBtn.textContent = 'Lưu lịch';
+  } else if (type === 'block-multi') {
+    noteLabel.textContent = 'Lý do khoá';
+    saveBtn.style.background = 'var(--orange)';
+    saveBtn.textContent = 'Khoá các tour đã chọn';
+  } else {
+    noteLabel.textContent = 'Lý do khoá';
+    saveBtn.style.background = 'var(--red)';
+    saveBtn.textContent = '🚫 Khoá tất cả tour';
+  }
+}
+
+function selectAllTours() {
+  const sel = document.getElementById('scheduleMultiTourId');
+  Array.from(sel.options).forEach(o => o.selected = true);
+}
+
+function deselectAllTours() {
+  const sel = document.getElementById('scheduleMultiTourId');
+  Array.from(sel.options).forEach(o => o.selected = false);
 }
 
 async function saveSchedule() {
-  const type     = document.getElementById('scheduleType').value;
-  const date     = document.getElementById('scheduleDate').value;
-  const note     = document.getElementById('scheduleNote').value;
-  const tour_id  = document.getElementById('scheduleTourId').value;
-  const max      = document.getElementById('scheduleMax').value;
+  const type  = document.getElementById('scheduleType').value;
+  const date  = document.getElementById('scheduleDate').value;
+  const note  = document.getElementById('scheduleNote').value;
 
   if (!date) { showToast('Vui lòng chọn ngày', 'error'); return; }
 
-  try {
-    const body = type === 'block'
-      ? { type: 'block', available_date: date, reason: note }
-      : { type: 'tour', tour_id, available_date: date, max_people: max, note };
+  const btn = document.getElementById('btnSaveSchedule');
+  btn.disabled = true;
+  btn.textContent = 'Đang lưu...';
 
-    const res = await fetch('/api/admin-schedule', {
-      method: 'POST', headers: authHeaders(), body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      closeModal('addModal');
-      showToast('Đã lưu lịch thành công!');
-      renderCalendar();
+  try {
+    if (type === 'tour') {
+      // Thêm lịch 1 tour
+      const tour_id = document.getElementById('scheduleTourId').value;
+      const max     = document.getElementById('scheduleMax').value;
+      await fetch('/api/admin-schedule', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ type: 'tour', tour_id, available_date: date, max_people: max, note })
+      });
+      showToast('✅ Đã thêm lịch tour!');
+
+    } else if (type === 'block-multi') {
+      // Khoá nhiều tour
+      const sel      = document.getElementById('scheduleMultiTourId');
+      const selected = Array.from(sel.options).filter(o => o.selected).map(o => o.value);
+      if (selected.length === 0) { showToast('Chọn ít nhất 1 tour', 'error'); btn.disabled = false; toggleScheduleType(); return; }
+
+      // Gọi API lần lượt cho từng tour
+      await Promise.all(selected.map(tour_id =>
+        fetch('/api/admin-schedule', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ type: 'block-tour', tour_id, available_date: date, note })
+        })
+      ));
+      showToast(`🔒 Đã khoá ${selected.length} tour ngày ${date}!`);
+
+    } else {
+      // Khoá tất cả (blocked_dates)
+      await fetch('/api/admin-schedule', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ type: 'block', available_date: date, reason: note })
+      });
+      showToast(`🚫 Đã khoá toàn bộ tour ngày ${date}!`);
     }
-  } catch (e) { showToast('Lỗi lưu lịch', 'error'); }
+
+    closeModal('addModal');
+    renderCalendar();
+
+  } catch (e) {
+    showToast('Lỗi lưu lịch', 'error');
+  } finally {
+    btn.disabled = false;
+    toggleScheduleType();
+  }
 }
 
 function closeModal(id) {

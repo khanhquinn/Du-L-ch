@@ -56,19 +56,28 @@ module.exports = async (req, res) => {
       const { type, tour_id, available_date, max_people, note, reason } = req.body;
 
       if (type === 'block') {
-        // Khoá ngày
+        // Khoá toàn bộ ngày
         await pool.query(
           `INSERT INTO blocked_dates (blocked_date, reason)
            VALUES ($1, $2)
            ON CONFLICT (blocked_date) DO UPDATE SET reason = $2`,
           [available_date, reason || null]
         );
+      } else if (type === 'block-tour') {
+        // Khoá 1 tour cụ thể trong ngày (thêm vào tour_schedules với is_blocked = true)
+        await pool.query(
+          `INSERT INTO tour_schedules (tour_id, available_date, max_people, note, is_blocked)
+           VALUES ($1, $2, $3, $4, true)
+           ON CONFLICT (tour_id, available_date) DO UPDATE
+           SET is_blocked = true, note = $4`,
+          [tour_id, available_date, max_people || 20, note || null]
+        );
       } else {
-        // Thêm lịch tour
+        // Thêm lịch tour bình thường
         await pool.query(
           `INSERT INTO tour_schedules (tour_id, available_date, max_people, note)
            VALUES ($1, $2, $3, $4)
-           ON CONFLICT (tour_id, available_date) DO UPDATE 
+           ON CONFLICT (tour_id, available_date) DO UPDATE
            SET max_people = $3, note = $4, is_blocked = false`,
           [tour_id, available_date, max_people || 20, note || null]
         );
