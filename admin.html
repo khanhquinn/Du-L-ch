@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Huế Tour</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark:  #0d0d0d; --dark2: #141414; --dark3: #1c1c1c; --dark4: #242424;
+      --gold:  #c9a84c; --gold2: #e2c97e;
+      --white: #f0ece4; --gray:  #888; --text: #d8d2c8;
+      --green: #2ecc71; --red: #e74c3c; --blue: #3498db; --orange: #f39c12;
+      --font: 'DM Sans', sans-serif; --serif: 'Playfair Display', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--text); font-family: var(--font); font-size: 14px; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── LOGIN ─────────────────────────────── */
+    #loginPage {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1208 0%, var(--dark) 70%);
+    }
+    .login-box {
+      background: var(--dark3); border: 1px solid rgba(201,168,76,.2);
+      border-radius: 8px; padding: 2.5rem; width: 380px;
+    }
+    .login-logo { text-align: center; margin-bottom: 2rem; }
+    .login-logo h1 { font-family: var(--serif); font-size: 2.5rem; color: var(--white); }
+    .login-logo p  { font-size: .75rem; color: var(--gold); letter-spacing: .2em; text-transform: uppercase; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: .75rem; color: var(--gray); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .05em; }
+    .form-group input {
+      width: 100%; background: var(--dark2); border: 1px solid rgba(255,255,255,.08);
+      color: var(--white); padding: .75rem 1rem; border-radius: 4px;
+      font-family: var(--font); font-size: .9rem; outline: none; transition: border .2s;
+    }
+    .form-group input:focus { border-color: var(--gold); }
+    .btn-login {
+      width: 100%; background: var(--gold); color: var(--dark); border: none;
+      padding: .85rem; border-radius: 4px; font-family: var(--font); font-size: .95rem;
+      font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .btn-login:hover { background: var(--gold2); }
+    .login-error { color: var(--red); font-size: .8rem; margin-top: .8rem; text-align: center; display: none; }
+
+    /* ── LAYOUT ────────────────────────────── */
+    #adminPage { display: none; min-height: 100vh; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 220px;
+      background: var(--dark2); border-right: 1px solid rgba(255,255,255,.06);
+      display: flex; flex-direction: column; z-index: 50;
+    }
+    .sidebar-logo { padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .sidebar-logo h2 { font-family: var(--serif); font-size: 1.5rem; color: var(--white); }
+    .sidebar-logo span { font-size: .65rem; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 1rem 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: .8rem;
+      padding: .75rem 1.5rem; color: var(--gray); cursor: pointer;
+      transition: all .2s; font-size: .85rem; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { color: var(--white); background: rgba(255,255,255,.04); }
+    .nav-item.active { color: var(--gold); background: rgba(201,168,76,.08); border-left-color: var(--gold); }
+    .nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+    .sidebar-bottom { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.06); }
+    .btn-logout {
+      width: 100%; background: transparent; border: 1px solid rgba(231,76,60,.3);
+      color: var(--red); padding: .6rem; border-radius: 4px; cursor: pointer;
+      font-family: var(--font); font-size: .8rem; transition: all .2s;
+    }
+    .btn-logout:hover { background: rgba(231,76,60,.1); }
+
+    .main-content { margin-left: 220px; padding: 2rem; min-height: 100vh; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--serif); font-size: 1.8rem; color: var(--white); }
+    .page-header p  { color: var(--gray); font-size: .85rem; margin-top: .3rem; }
+
+    /* ── TABS ──────────────────────────────── */
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+
+    /* ── STAT CARDS ────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--dark3); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 6px; padding: 1.5rem; position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .stat-card.gold::before  { background: var(--gold); }
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.blue::before  { background: var(--blue); }
+    .stat-card.orange::before{ background: var(--orange); }
+    .stat-label { font-size: .75rem; color: var(--gray); text-transform: uppercase; letter-spacing: .05em; }
+    .stat-value { font-family: var(--serif); font-size: 2rem; color: var(--white); margin: .5rem 0 .3rem; }
+    .stat-sub   { font-size: .75rem; color: var(--gray); }
+
+    /* ── TABLE ─────────────────────────────── */
+    .table-wrap { background: var(--dark3); border: 1px solid rgba(255,255,255,.06); border-radius: 6px; overflow: hidden; }
+    .table-header { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: center; }
+    .table-header h3 { font-size: .95rem; color: var(--white); }
+    .filter-select {
+      background: var(--dark4); border: 1px solid rgba(255,255,255,.08);
+      color: var(--text); padding: .4rem .8rem; border-radius: 4px;
+      font-family: var(--font); font-size: .8rem; outline: none; cursor: pointer;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: .75rem 1rem; text-align: left; font-size: .7rem; color: var(--gray); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid rgba(255,255,255,.06); background: var(--dark4); }
+    td { padding: .85rem 1rem; font-size: .82rem; border-bottom: 1px solid rgba(255,255,255,.04); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    .badge {
+      display: inline-block; padding: .25rem .6rem; border-radius: 2px;
+      font-size: .7rem; font-weight: 600; letter-spacing: .05em;
+    }
+    .badge-pending  { background: rgba(243,156,18,.15);  color: var(--orange); }
+    .badge-confirm  { background: rgba(46,204,113,.15);  color: var(--green); }
+    .badge-cancel   { background: rgba(231,76,60,.15);   color: var(--red); }
+    .badge-done     { background: rgba(52,152,219,.15);  color: var(--blue); }
+
+    .action-btns { display: flex; gap: .4rem; }
+    .btn-sm {
+      padding: .3rem .7rem; border-radius: 3px; font-size: .72rem;
+      cursor: pointer; border: none; font-family: var(--font); font-weight: 500;
+      transition: opacity .2s;
+    }
+    .btn-sm:hover { opacity: .8; }
+    .btn-confirm { background: rgba(46,204,113,.2);  color: var(--green); }
+    .btn-cancel  { background: rgba(231,76,60,.2);   color: var(--red); }
+    .btn-done    { background: rgba(52,152,219,.2);  color: var(--blue); }
+
+    /* ── CALENDAR ──────────────────────────── */
+    .calendar-controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .calendar-controls h3 { font-family: var(--serif); font-size: 1.2rem; color: var(--white); min-width: 150px; text-align: center; }
+    .btn-nav {
+      background: var(--dark3); border: 1px solid rgba(255,255,255,.08);
+      color: var(--text); width: 36px; height: 36px; border-radius: 4px;
+      cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: border-color .2s;
+    }
+    .btn-nav:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-add-schedule {
+      margin-left: auto; background: var(--gold); color: var(--dark); border: none;
+      padding: .5rem 1.2rem; border-radius: 4px; font-family: var(--font);
+      font-size: .8rem; font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .btn-add-schedule:hover { background: var(--gold2); }
+
+    .calendar-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 1rem;
+    }
+    .cal-day-name { text-align: center; padding: .5rem; font-size: .7rem; color: var(--gray); text-transform: uppercase; }
+    .cal-day {
+      background: var(--dark3); border: 1px solid rgba(255,255,255,.05);
+      border-radius: 4px; min-height: 80px; padding: .5rem; cursor: pointer;
+      transition: border-color .2s; position: relative;
+    }
+    .cal-day:hover { border-color: rgba(201,168,76,.3); }
+    .cal-day.other-month { opacity: .3; }
+    .cal-day.today { border-color: var(--gold); }
+    .cal-day.blocked { background: rgba(231,76,60,.08); border-color: rgba(231,76,60,.2); }
+    .cal-day-num { font-size: .75rem; color: var(--gray); margin-bottom: .3rem; }
+    .cal-day.today .cal-day-num { color: var(--gold); font-weight: 600; }
+    .cal-tour-tag {
+      font-size: .6rem; padding: .1rem .3rem; border-radius: 2px; margin-bottom: 2px;
+      display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cal-blocked-tag { font-size: .6rem; color: var(--red); font-weight: 600; }
+
+    /* ── MODAL ─────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      display: none; align-items: center; justify-content: center; z-index: 200;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--dark3); border: 1px solid rgba(201,168,76,.2);
+      border-radius: 8px; padding: 2rem; width: 460px; max-width: 95vw;
+    }
+    .modal h3 { font-family: var(--serif); font-size: 1.2rem; color: var(--white); margin-bottom: 1.5rem; }
+    .modal .form-group input,
+    .modal .form-group select,
+    .modal .form-group textarea {
+      width: 100%; background: var(--dark2); border: 1px solid rgba(255,255,255,.08);
+      color: var(--white); padding: .65rem .9rem; border-radius: 4px;
+      font-family: var(--font); font-size: .85rem; outline: none; transition: border .2s;
+    }
+    .modal .form-group select option { background: var(--dark2); }
+    .modal .form-group input:focus,
+    .modal .form-group select:focus { border-color: var(--gold); }
+    .modal-footer { display: flex; gap: .8rem; margin-top: 1.5rem; justify-content: flex-end; }
+    .btn-modal-cancel { background: var(--dark4); border: 1px solid rgba(255,255,255,.1); color: var(--gray); padding: .6rem 1.2rem; border-radius: 4px; cursor: pointer; font-family: var(--font); }
+    .btn-modal-save   { background: var(--gold); color: var(--dark); border: none; padding: .6rem 1.5rem; border-radius: 4px; cursor: pointer; font-family: var(--font); font-weight: 600; }
+
+    /* ── RECENT ────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    .top-tour-item { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1rem; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .82rem; }
+    .top-tour-item:last-child { border-bottom: none; }
+
+    /* ── LOADING ───────────────────────────── */
+    .loading { text-align: center; padding: 3rem; color: var(--gray); }
+    .spinner-sm { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(201,168,76,.3); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Notification toast */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; background: var(--dark3);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 6px;
+      padding: 1rem 1.5rem; font-size: .85rem; z-index: 999;
+      transform: translateY(100px); opacity: 0; transition: all .3s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(46,204,113,.3); color: var(--green); }
+    .toast.error   { border-color: rgba(231,76,60,.3);  color: var(--red); }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 60px; }
+      .sidebar-logo, .nav-item span, .sidebar-bottom { display: none; }
+      .main-content { margin-left: 60px; padding: 1rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN PAGE ══════════════════════════════════════════ -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>Huế</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <div class="form-group">
+      <label>Tên đăng nhập</label>
+      <input type="text" id="loginUser" placeholder="admin" value="admin"/>
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="loginPass" placeholder="••••••••" value="hue2026"/>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Đăng Nhập</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PAGE ══════════════════════════════════════════ -->
+<div id="adminPage">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>Huế</h2>
+      <span>Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showTab('dashboard')">
+        <span class="nav-icon">📊</span><span>Tổng Quan</span>
+      </div>
+      <div class="nav-item" onclick="showTab('bookings')">
+        <span class="nav-icon">📋</span><span>Đặt Tour</span>
+      </div>
+      <div class="nav-item" onclick="showTab('calendar')">
+        <span class="nav-icon">📅</span><span>Lịch Tour</span>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" onclick="doLogout()">🚪 Đăng Xuất</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- ── DASHBOARD TAB ── -->
+    <div class="tab-page active" id="tab-dashboard">
+      <div class="page-header">
+        <h1>Tổng Quan</h1>
+        <p>Thống kê hoạt động tour du lịch Huế</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card gold">
+          <div class="stat-label">Tổng Booking</div>
+          <div class="stat-value" id="st-total">–</div>
+          <div class="stat-sub">Không tính đã huỷ</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Chờ Xác Nhận</div>
+          <div class="stat-value" id="st-pending">–</div>
+          <div class="stat-sub">Cần xử lý</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Doanh Thu</div>
+          <div class="stat-value" id="st-revenue">–</div>
+          <div class="stat-sub">Từ booking đã xác nhận</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Tổng Khách</div>
+          <div class="stat-value" id="st-guests">–</div>
+          <div class="stat-sub">Người lớn + trẻ em</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="table-wrap">
+          <div class="table-header"><h3>🕐 Booking Mới Nhất</h3></div>
+          <table>
+            <thead><tr><th>Khách hàng</th><th>Tour</th><th>Ngày đi</th><th>Trạng thái</th></tr></thead>
+            <tbody id="recentBody"><tr><td colspan="4" class="loading"><div class="spinner-sm"></div></td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>🏆 Tour Được Đặt Nhiều</h3></div>
+          <div id="topToursBody"><div class="loading"><div class="spinner-sm"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BOOKINGS TAB ── -->
+    <div class="tab-page" id="tab-bookings">
+      <div class="page-header">
+        <h1>Quản Lý Đặt Tour</h1>
+        <p>Xác nhận, huỷ và theo dõi tất cả đơn đặt tour</p>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>Danh Sách Booking</h3>
+          <select class="filter-select" id="bookingFilter" onchange="loadBookings()">
+            <option value="all">Tất cả</option>
+            <option value="Chờ xác nhận">Chờ xác nhận</option>
+            <option value="Đã xác nhận">Đã xác nhận</option>
+            <option value="Đã huỷ">Đã huỷ</option>
+            <option value="Hoàn thành">Hoàn thành</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Khách hàng</th><th>SĐT</th><th>Tour</th>
+              <th>Ngày đi</th><th>Khách</th><th>Tổng tiền</th>
+              <th>Trạng thái</th><th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody">
+            <tr><td colspan="9" class="loading"><div class="spinner-sm"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CALENDAR TAB ── -->
+    <div class="tab-page" id="tab-calendar">
+      <div class="page-header">
+        <h1>Lịch Tour</h1>
+        <p>Quản lý lịch khởi hành và khoá ngày không nhận khách</p>
+      </div>
+      <div class="calendar-controls">
+        <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
+        <h3 id="calMonthTitle">–</h3>
+        <button class="btn-nav" onclick="changeMonth(1)">›</button>
+        <button class="btn-add-schedule" onclick="openAddModal()">+ Thêm Lịch</button>
+      </div>
+      <div class="calendar-grid" id="calDayNames"></div>
+      <div class="calendar-grid" id="calGrid"><div class="loading" style="grid-column:span 7"><div class="spinner-sm"></div></div></div>
+
+      <div style="margin-top:1rem; display:flex; gap:1rem; font-size:.75rem; color:var(--gray)">
+        <span>🟡 Tour đã lên lịch</span>
+        <span>🔴 Ngày bị khoá</span>
+        <span>⬜ Ngày trống</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ MODAL THÊM LỊCH ════════════════════════════════════ -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h3 id="modalTitle">Thêm Lịch Tour</h3>
+    <div class="form-group">
+      <label>Loại</label>
+      <select id="scheduleType" onchange="toggleScheduleType()">
+        <option value="tour">Lịch tour cụ thể</option>
+        <option value="block">Khoá ngày (không nhận khách)</option>
+      </select>
+    </div>
+    <div id="tourFields">
+      <div class="form-group">
+        <label>Chọn Tour</label>
+        <select id="scheduleTourId"></select>
+      </div>
+      <div class="form-group">
+        <label>Số khách tối đa</label>
+        <input type="number" id="scheduleMax" value="20" min="1" max="100"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Ngày</label>
+      <input type="date" id="scheduleDate"/>
+    </div>
+    <div class="form-group">
+      <label id="noteLabel">Ghi chú</label>
+      <input type="text" id="scheduleNote" placeholder="Ghi chú tuỳ chọn..."/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal('addModal')">Huỷ</button>
+      <button class="btn-modal-save" onclick="saveSchedule()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL HUỶ BOOKING ══════════════════════════════════ -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal">
+    <h3>Huỷ Booking #<span id="cancelId"></span></h3>
+    <div class="form-group">
+      <label>Lý do huỷ</label>
+      <input type="text" id="cancelReason" placeholder="VD: Không đủ số lượng khách..."/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal('cancelModal')">Quay lại</button>
+      <button class="btn-modal-save" style="background:var(--red)" onclick="confirmCancel()">Xác nhận huỷ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+let TOKEN = localStorage.getItem('hue_admin_token') || '';
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth() + 1;
+let allTours = [];
+let cancelBookingId = null;
+
+// ── AUTH ──────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('loginUser').value;
+  const password = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error; err.style.display = 'block'; return; }
+
+    TOKEN = data.token;
+    localStorage.setItem('hue_admin_token', TOKEN);
+    showAdmin();
+  } catch (e) {
+    err.textContent = 'Lỗi kết nối server'; err.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('hue_admin_token');
+  TOKEN = '';
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+function showAdmin() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('adminPage').style.display = 'block';
+  loadStats();
+  loadBookings();
+  loadTours();
+  renderCalendar();
+}
+
+// Nếu đã có token, tự vào admin
+if (TOKEN) showAdmin();
+
+// Enter key for login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
+});
+
+// ── HELPERS ───────────────────────────────────────────────
+const authHeaders = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN });
+
+function formatPrice(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+function formatDate(d)  { if (!d) return '–'; return new Date(d).toLocaleDateString('vi-VN'); }
+
+function statusBadge(s) {
+  const map = { 'Chờ xác nhận': 'pending', 'Đã xác nhận': 'confirm', 'Đã huỷ': 'cancel', 'Hoàn thành': 'done' };
+  return `<span class="badge badge-${map[s] || 'pending'}">${s}</span>`;
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── TAB NAVIGATION ────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'bookings') loadBookings();
+  if (name === 'calendar') renderCalendar();
+}
+
+// ── STATS ─────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res  = await fetch('/api/admin-stats', { headers: authHeaders() });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+    const ov   = data.overview;
+
+    document.getElementById('st-total').textContent   = ov.total_bookings;
+    document.getElementById('st-pending').textContent = ov.pending;
+    document.getElementById('st-guests').textContent  = ov.total_guests;
+    document.getElementById('st-revenue').textContent =
+      Number(ov.total_revenue) >= 1000000
+        ? (Number(ov.total_revenue)/1000000).toFixed(1) + 'tr'
+        : formatPrice(ov.total_revenue);
+
+    // Recent bookings
+    const rb = document.getElementById('recentBody');
+    rb.innerHTML = data.recent.map(b => `
+      <tr>
+        <td><strong>${b.full_name}</strong><br><span style="color:var(--gray)">${b.phone}</span></td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.tour_title}</td>
+        <td>${formatDate(b.departure_date)}</td>
+        <td>${statusBadge(b.status)}</td>
+      </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:2rem">Chưa có booking</td></tr>';
+
+    // Top tours
+    const tt = document.getElementById('topToursBody');
+    tt.innerHTML = data.topTours.map((t, i) => `
+      <div class="top-tour-item">
+        <div>
+          <div style="color:var(--white)">${i+1}. ${t.title.substring(0,30)}...</div>
+          <div style="color:var(--gray);font-size:.72rem">${t.total_bookings} booking</div>
+        </div>
+        <div style="color:var(--gold-light);font-weight:600">${formatPrice(t.revenue)}</div>
+      </div>`).join('') || '<div class="loading" style="color:var(--gray)">Chưa có dữ liệu</div>';
+
+  } catch (e) { console.error(e); }
+}
+
+// ── BOOKINGS ──────────────────────────────────────────────
+async function loadBookings() {
+  const status = document.getElementById('bookingFilter')?.value || 'all';
+  const tbody  = document.getElementById('bookingsBody');
+  tbody.innerHTML = '<tr><td colspan="9" class="loading"><div class="spinner-sm"></div></td></tr>';
+
+  try {
+    const url = status === 'all' ? '/api/admin-bookings' : `/api/admin-bookings?status=${encodeURIComponent(status)}`;
+    const res  = await fetch(url, { headers: authHeaders() });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+
+    tbody.innerHTML = data.map(b => `
+      <tr>
+        <td style="color:var(--gray)">#${b.id}</td>
+        <td><strong>${b.full_name}</strong></td>
+        <td><a href="https://zalo.me/${b.phone}" target="_blank" style="color:var(--blue)">${b.phone}</a></td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${b.tour_title}">${b.tour_title}</td>
+        <td>${formatDate(b.departure_date)}</td>
+        <td>${b.num_adults}NL${b.num_children > 0 ? ' + ' + b.num_children + 'TE' : ''}</td>
+        <td style="color:var(--gold)">${formatPrice(b.total_price)}</td>
+        <td>${statusBadge(b.status)}</td>
+        <td>
+          <div class="action-btns">
+            ${b.status === 'Chờ xác nhận' ? `
+              <button class="btn-sm btn-confirm" onclick="updateBooking(${b.id},'Đã xác nhận')">✓ Xác nhận</button>
+              <button class="btn-sm btn-cancel"  onclick="openCancel(${b.id})">✕ Huỷ</button>
+            ` : ''}
+            ${b.status === 'Đã xác nhận' ? `
+              <button class="btn-sm btn-done" onclick="updateBooking(${b.id},'Hoàn thành')">✓ Hoàn thành</button>
+            ` : ''}
+          </div>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:2rem">Không có booking</td></tr>';
+  } catch (e) { console.error(e); }
+}
+
+async function updateBooking(id, status) {
+  try {
+    const res = await fetch('/api/admin-bookings', {
+      method: 'PUT', headers: authHeaders(),
+      body: JSON.stringify({ id, status })
+    });
+    if (res.ok) { showToast(`Đã cập nhật trạng thái: ${status}`); loadBookings(); loadStats(); }
+  } catch (e) { showToast('Lỗi cập nhật', 'error'); }
+}
+
+function openCancel(id) {
+  cancelBookingId = id;
+  document.getElementById('cancelId').textContent = id;
+  document.getElementById('cancelReason').value = '';
+  document.getElementById('cancelModal').classList.add('open');
+}
+
+async function confirmCancel() {
+  const reason = document.getElementById('cancelReason').value;
+  try {
+    const res = await fetch('/api/admin-bookings', {
+      method: 'PUT', headers: authHeaders(),
+      body: JSON.stringify({ id: cancelBookingId, status: 'Đã huỷ', cancelled_reason: reason })
+    });
+    if (res.ok) {
+      closeModal('cancelModal');
+      showToast('Đã huỷ booking #' + cancelBookingId);
+      loadBookings(); loadStats();
+    }
+  } catch (e) { showToast('Lỗi huỷ booking', 'error'); }
+}
+
+// ── CALENDAR ──────────────────────────────────────────────
+async function loadTours() {
+  const res = await fetch('/api/tours');
+  allTours  = await res.json();
+  const sel = document.getElementById('scheduleTourId');
+  sel.innerHTML = allTours.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+}
+
+async function renderCalendar() {
+  const title = document.getElementById('calMonthTitle');
+  const months = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
+                  'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+  title.textContent = `${months[calMonth-1]} ${calYear}`;
+
+  // Day names
+  const dn = document.getElementById('calDayNames');
+  dn.innerHTML = ['CN','T2','T3','T4','T5','T6','T7'].map(d =>
+    `<div class="cal-day-name">${d}</div>`).join('');
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '<div class="loading" style="grid-column:span 7"><div class="spinner-sm"></div></div>';
+
+  try {
+    const res  = await fetch(`/api/admin-schedule?month=${calMonth}&year=${calYear}`, { headers: authHeaders() });
+    const data = await res.json();
+
+    const firstDay = new Date(calYear, calMonth-1, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth, 0).getDate();
+    const today = new Date().toDateString();
+
+    // Map schedules và blocked
+    const schedMap = {};
+    data.schedules.forEach(s => {
+      const d = s.available_date.split('T')[0];
+      if (!schedMap[d]) schedMap[d] = [];
+      schedMap[d].push(s);
+    });
+    const blockedSet = new Set(data.blocked.map(b => b.blocked_date.split('T')[0]));
+
+    let html = '';
+    // Ô trống đầu tháng
+    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day other-month"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${calYear}-${String(calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday   = new Date(dateStr).toDateString() === today;
+      const isBlocked = blockedSet.has(dateStr);
+      const tours     = schedMap[dateStr] || [];
+
+      const cls = ['cal-day', isToday ? 'today' : '', isBlocked ? 'blocked' : ''].filter(Boolean).join(' ');
+      const colors = ['#c9a84c','#3498db','#2ecc71','#e74c3c','#9b59b6','#f39c12'];
+
+      html += `<div class="${cls}" onclick="onDayClick('${dateStr}')">
+        <div class="cal-day-num">${d}</div>
+        ${isBlocked ? '<div class="cal-blocked-tag">🔴 Khoá</div>' : ''}
+        ${tours.map((t, i) => `
+          <span class="cal-tour-tag" style="background:${colors[i%colors.length]}22;color:${colors[i%colors.length]}">
+            ${t.tour_title?.substring(0,15) || 'Tour'}${t.is_blocked ? ' 🔒' : ''}
+          </span>`).join('')}
+      </div>`;
+    }
+
+    grid.innerHTML = html;
+  } catch (e) { console.error(e); grid.innerHTML = '<div class="loading" style="grid-column:span 7;color:var(--red)">Lỗi tải lịch</div>'; }
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 12) { calMonth = 1;  calYear++; }
+  if (calMonth < 1)  { calMonth = 12; calYear--; }
+  renderCalendar();
+}
+
+function onDayClick(dateStr) {
+  document.getElementById('scheduleDate').value = dateStr;
+  openAddModal();
+}
+
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+}
+
+function toggleScheduleType() {
+  const type = document.getElementById('scheduleType').value;
+  document.getElementById('tourFields').style.display = type === 'tour' ? 'block' : 'none';
+  document.getElementById('noteLabel').textContent = type === 'block' ? 'Lý do khoá' : 'Ghi chú';
+}
+
+async function saveSchedule() {
+  const type     = document.getElementById('scheduleType').value;
+  const date     = document.getElementById('scheduleDate').value;
+  const note     = document.getElementById('scheduleNote').value;
+  const tour_id  = document.getElementById('scheduleTourId').value;
+  const max      = document.getElementById('scheduleMax').value;
+
+  if (!date) { showToast('Vui lòng chọn ngày', 'error'); return; }
+
+  try {
+    const body = type === 'block'
+      ? { type: 'block', available_date: date, reason: note }
+      : { type: 'tour', tour_id, available_date: date, max_people: max, note };
+
+    const res = await fetch('/api/admin-schedule', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      closeModal('addModal');
+      showToast('Đã lưu lịch thành công!');
+      renderCalendar();
+    }
+  } catch (e) { showToast('Lỗi lưu lịch', 'error'); }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Đóng modal khi click ngoài
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
