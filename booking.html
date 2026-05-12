@@ -7,6 +7,54 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css"/>
+  <!-- Flatpickr date picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    /* ===== FLATPICKR DARK THEME ===== */
+    .flatpickr-calendar {
+      background: #1a1a1a !important;
+      border: 1px solid rgba(201,168,76,0.3) !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
+      border-radius: 6px !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
+    .flatpickr-months { background: #111 !important; border-radius: 6px 6px 0 0; padding: .5rem 0; }
+    .flatpickr-month { color: #e2c97e !important; }
+    .flatpickr-current-month { color: #e2c97e !important; font-size: 1rem !important; }
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+      background: #111 !important; color: #e2c97e !important;
+    }
+    .flatpickr-current-month input.cur-year { color: #e2c97e !important; }
+    .flatpickr-prev-month, .flatpickr-next-month { color: #c9a84c !important; fill: #c9a84c !important; }
+    .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill: #e2c97e !important; }
+    .flatpickr-weekday { color: #888 !important; background: #111 !important; font-size: .72rem; }
+    .flatpickr-day { color: #d8d2c8 !important; border-radius: 4px !important; }
+    .flatpickr-day:hover { background: rgba(201,168,76,.15) !important; border-color: rgba(201,168,76,.3) !important; }
+    .flatpickr-day.selected, .flatpickr-day.selected:hover {
+      background: #c9a84c !important; border-color: #c9a84c !important; color: #0a0a0a !important; font-weight: 600;
+    }
+    .flatpickr-day.today { border-color: rgba(201,168,76,.5) !important; }
+    .flatpickr-day.today:hover { background: rgba(201,168,76,.2) !important; }
+    .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover {
+      color: #333 !important; text-decoration: line-through; cursor: not-allowed;
+    }
+    .flatpickr-day.has-tours {
+      background: rgba(46,204,113,.1) !important;
+      border-color: rgba(46,204,113,.3) !important;
+    }
+    .flatpickr-day.has-tours::after {
+      content: '•'; position: absolute; bottom: 2px; left: 50%;
+      transform: translateX(-50%); color: #2ecc71; font-size: 10px;
+    }
+    /* Input wrapper */
+    .date-picker-wrap { position: relative; }
+    .date-picker-wrap .cal-icon {
+      position: absolute; right: .9rem; top: 50%; transform: translateY(-50%);
+      color: #888; pointer-events: none; font-size: 1rem;
+    }
+    .flatpickr-input { cursor: pointer !important; }
+    .flatpickr-input[readonly] { cursor: pointer !important; }
+  </style>
   <style>
     /* ===== BOOKING PAGE STYLES ===== */
     .booking-page {
@@ -421,8 +469,11 @@
 
               <div class="form-group" id="grp-date">
                 <label>Ngày khởi hành *</label>
-                <input type="date" id="departure_date" />
-                <div class="form-error">Vui lòng chọn ngày khởi hành (không được là ngày quá khứ)</div>
+                <div class="date-picker-wrap">
+                  <input type="text" id="departure_date" placeholder="Chọn ngày khởi hành..." readonly/>
+                  <span class="cal-icon">📅</span>
+                </div>
+                <div class="form-error">Vui lòng chọn ngày khởi hành</div>
               </div>
 
               <div class="form-row">
@@ -443,7 +494,7 @@
                   <div class="form-error">Vui lòng chọn số người lớn</div>
                 </div>
                 <div class="form-group">
-                  <label>Số trẻ em (dưới 10 tuổi)</label>
+                  <label>Số trẻ em (dưới 12 tuổi)</label>
                   <select id="num_children">
                     <option value="0">Không có</option>
                     <option value="1">1 trẻ em</option>
@@ -517,6 +568,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
   // ===== DỮ LIỆU TOUR (khớp với database Railway) =====
   const TOURS = {
@@ -633,7 +685,58 @@
   // Đặt ngày tối thiểu = ngày mai
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  document.getElementById('departure_date').min = tomorrow.toISOString().split('T')[0];
+
+  // ===== FLATPICKR CALENDAR =====
+  let datePicker;
+
+  async function initDatePicker() {
+    // Lấy ngày có lịch tour từ database (nếu có)
+    let availableDates = [];
+    try {
+      const res = await fetch(`/api/admin-schedule?month=${new Date().getMonth()+1}&year=${new Date().getFullYear()}`);
+      if (res.ok) {
+        const data = await res.json();
+        availableDates = data.schedules
+          .filter(s => s.tour_id == tourId && !s.is_blocked)
+          .map(s => s.available_date.split('T')[0]);
+      }
+    } catch (e) { /* Không có lịch cố định, cho chọn tự do */ }
+
+    datePicker = flatpickr('#departure_date', {
+      locale: {
+        firstDayOfWeek: 1,
+        weekdays: {
+          shorthand: ['CN','T2','T3','T4','T5','T6','T7'],
+          longhand:  ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy']
+        },
+        months: {
+          shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'],
+          longhand:  ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
+                      'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12']
+        }
+      },
+      minDate: tomorrow,
+      dateFormat: 'Y-m-d',
+      altInput: true,
+      altFormat: 'D, d/m/Y',
+      disableMobile: true,
+      onDayCreate: function(dObj, dStr, fp, dayElem) {
+        // Đánh dấu ngày có lịch tour
+        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        if (availableDates.includes(dateStr)) {
+          dayElem.classList.add('has-tours');
+          dayElem.title = 'Có lịch tour';
+        }
+      },
+      onChange: function(selectedDates) {
+        if (selectedDates.length > 0) {
+          document.getElementById('grp-date').classList.remove('error');
+        }
+      }
+    });
+  }
+
+  initDatePicker();
 
   // ===== TÍNH TIỀN =====
   function formatPrice(n) {
