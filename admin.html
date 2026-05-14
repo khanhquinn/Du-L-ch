@@ -201,6 +201,26 @@
     .top-tour-item { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1rem; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .82rem; }
     .top-tour-item:last-child { border-bottom: none; }
 
+    /* ── VIEW BUTTONS ──────────────────────── */
+    .view-btn {
+      background: var(--dark3); border: 1px solid rgba(255,255,255,.08);
+      color: var(--gray); padding: .5rem 1.2rem; border-radius: 4px;
+      cursor: pointer; font-family: var(--font); font-size: .82rem; transition: all .2s;
+    }
+    .view-btn.active { background: rgba(201,168,76,.1); border-color: var(--gold); color: var(--gold); }
+    .group-card {
+      background: var(--dark3); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 6px; margin-bottom: 1.5rem; overflow: hidden;
+    }
+    .group-header {
+      background: var(--dark4); padding: 1rem 1.5rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem;
+    }
+    .group-title { font-family: var(--serif); font-size: 1rem; color: var(--white); }
+    .group-meta  { display: flex; gap: 1rem; font-size: .78rem; }
+    .group-meta span { color: var(--gray); }
+    .group-meta strong { color: var(--gold); }
+
     /* ── LOADING ───────────────────────────── */
     .loading { text-align: center; padding: 3rem; color: var(--gray); }
     .spinner-sm { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(201,168,76,.3); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; }
@@ -326,29 +346,44 @@
         <h1>Quản Lý Đặt Tour</h1>
         <p>Xác nhận, huỷ và theo dõi tất cả đơn đặt tour</p>
       </div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <h3>Danh Sách Booking</h3>
-          <select class="filter-select" id="bookingFilter" onchange="loadBookings()">
-            <option value="all">Tất cả</option>
-            <option value="Chờ xác nhận">Chờ xác nhận</option>
-            <option value="Đã xác nhận">Đã xác nhận</option>
-            <option value="Đã huỷ">Đã huỷ</option>
-            <option value="Hoàn thành">Hoàn thành</option>
-          </select>
+
+      <!-- View toggle -->
+      <div style="display:flex;gap:.5rem;margin-bottom:1.5rem">
+        <button class="view-btn active" id="btnListView" onclick="switchView('list')">📋 Danh Sách</button>
+        <button class="view-btn" id="btnGroupView" onclick="switchView('group')">👥 Theo Ngày & Tour</button>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div id="listView">
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>Danh Sách Booking</h3>
+            <select class="filter-select" id="bookingFilter" onchange="loadBookings()">
+              <option value="all">Tất cả</option>
+              <option value="Chờ xác nhận">Chờ xác nhận</option>
+              <option value="Đã xác nhận">Đã xác nhận</option>
+              <option value="Đã huỷ">Đã huỷ</option>
+              <option value="Hoàn thành">Hoàn thành</option>
+            </select>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Khách hàng</th><th>SĐT</th><th>Tour</th>
+                <th>Ngày đi</th><th>Khách</th><th>Tổng tiền</th>
+                <th>Trạng thái</th><th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsBody">
+              <tr><td colspan="9" class="loading"><div class="spinner-sm"></div></td></tr>
+            </tbody>
+          </table>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>Khách hàng</th><th>SĐT</th><th>Tour</th>
-              <th>Ngày đi</th><th>Khách</th><th>Tổng tiền</th>
-              <th>Trạng thái</th><th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody id="bookingsBody">
-            <tr><td colspan="9" class="loading"><div class="spinner-sm"></div></td></tr>
-          </tbody>
-        </table>
+      </div>
+
+      <!-- GROUP VIEW -->
+      <div id="groupView" style="display:none">
+        <div id="groupContent"><div class="loading"><div class="spinner-sm"></div></div></div>
       </div>
     </div>
 
@@ -580,6 +615,82 @@ async function loadStats() {
       </div>`).join('') || '<div class="loading" style="color:var(--gray)">Chưa có dữ liệu</div>';
 
   } catch (e) { console.error(e); }
+}
+
+// ── VIEW SWITCH ───────────────────────────────────────────
+function switchView(type) {
+  document.getElementById('listView').style.display  = type === 'list'  ? 'block' : 'none';
+  document.getElementById('groupView').style.display = type === 'group' ? 'block' : 'none';
+  document.getElementById('btnListView').classList.toggle('active',  type === 'list');
+  document.getElementById('btnGroupView').classList.toggle('active', type === 'group');
+  if (type === 'group') loadGroupView();
+}
+
+async function loadGroupView() {
+  const content = document.getElementById('groupContent');
+  content.innerHTML = '<div class="loading"><div class="spinner-sm"></div></div>';
+
+  try {
+    const res  = await fetch('/api/admin-bookings', { headers: authHeaders() });
+    const data = await res.json();
+
+    // Nhóm theo tour_title + departure_date
+    const groups = {};
+    data.forEach(b => {
+      if (b.status === 'Đã huỷ') return;
+      const key = `${b.departure_date?.split('T')[0]}_${b.tour_title}`;
+      if (!groups[key]) groups[key] = {
+        date: b.departure_date, tour: b.tour_title,
+        destination: b.destination_name, bookings: [],
+        totalAdults: 0, totalChildren: 0, totalRevenue: 0
+      };
+      groups[key].bookings.push(b);
+      groups[key].totalAdults   += Number(b.num_adults)   || 0;
+      groups[key].totalChildren += Number(b.num_children) || 0;
+      groups[key].totalRevenue  += Number(b.total_price)  || 0;
+    });
+
+    const sorted = Object.values(groups).sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    if (sorted.length === 0) {
+      content.innerHTML = '<div style="text-align:center;color:var(--gray);padding:3rem">Chưa có booking nào</div>';
+      return;
+    }
+
+    content.innerHTML = sorted.map(g => `
+      <div class="group-card">
+        <div class="group-header">
+          <div>
+            <div class="group-title">📅 ${formatDate(g.date)} &nbsp;–&nbsp; ${g.tour}</div>
+            <div style="font-size:.75rem;color:var(--gray);margin-top:.2rem">📍 ${g.destination}</div>
+          </div>
+          <div class="group-meta">
+            <span>👥 <strong>${g.totalAdults}</strong> NL + <strong>${g.totalChildren}</strong> TE</span>
+            <span>💰 <strong style="color:var(--gold)">${formatPrice(g.totalRevenue)}</strong></span>
+            <span>${statusBadge('Đã xác nhận')}</span>
+          </div>
+        </div>
+        <table style="width:100%">
+          <thead><tr>
+            <th>#</th><th>Họ tên</th><th>SĐT (Zalo)</th><th>Email</th>
+            <th>Khách</th><th>Tiền</th><th>Trạng thái</th><th>Ghi chú</th>
+          </tr></thead>
+          <tbody>
+            ${g.bookings.map(b => `<tr>
+              <td style="color:var(--gray)">#${b.id}</td>
+              <td><strong>${b.full_name}</strong></td>
+              <td><a href="https://zalo.me/${b.phone}" target="_blank" style="color:var(--blue)">${b.phone}</a></td>
+              <td style="color:var(--gray)">${b.email || '–'}</td>
+              <td>${b.num_adults}NL${b.num_children > 0 ? '+'+b.num_children+'TE' : ''}</td>
+              <td style="color:var(--gold)">${formatPrice(b.total_price)}</td>
+              <td>${statusBadge(b.status)}</td>
+              <td style="color:var(--gray);font-size:.75rem">${b.note || '–'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`).join('');
+
+  } catch (e) { content.innerHTML = '<div style="color:var(--red);text-align:center;padding:2rem">Lỗi tải dữ liệu</div>'; }
 }
 
 // ── BOOKINGS ──────────────────────────────────────────────

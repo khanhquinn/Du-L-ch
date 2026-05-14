@@ -56,6 +56,67 @@
     .flatpickr-input[readonly] { cursor: pointer !important; }
   </style>
   <style>
+    /* ===== FIXED DATES GRID ===== */
+    .fixed-dates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: .6rem;
+      margin-bottom: .5rem;
+    }
+    .date-btn {
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 4px;
+      padding: .7rem .5rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+      position: relative;
+    }
+    .date-btn:hover {
+      border-color: var(--gold);
+      background: rgba(201,168,76,.08);
+    }
+    .date-btn.selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,.15);
+    }
+    .date-btn.full {
+      opacity: .5;
+      cursor: not-allowed;
+      border-color: rgba(231,76,60,.2);
+    }
+    .date-btn .date-day {
+      font-size: .7rem;
+      color: var(--gray);
+      display: block;
+      margin-bottom: .2rem;
+    }
+    .date-btn .date-num {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--white);
+      display: block;
+    }
+    .date-btn.selected .date-num { color: var(--gold); }
+    .date-btn .date-slots {
+      font-size: .65rem;
+      margin-top: .2rem;
+      display: block;
+    }
+    .date-btn .date-slots.ok   { color: var(--green, #2ecc71); }
+    .date-btn .date-slots.low  { color: var(--orange, #f39c12); }
+    .date-btn .date-slots.full { color: var(--red, #e74c3c); }
+    .no-schedule-msg {
+      background: rgba(52,152,219,.08);
+      border: 1px solid rgba(52,152,219,.2);
+      border-radius: 4px;
+      padding: .8rem 1rem;
+      font-size: .82rem;
+      color: #3498db;
+      margin-bottom: .5rem;
+    }
+
     /* ===== BOOKING PAGE STYLES ===== */
     .booking-page {
       min-height: 100vh;
@@ -469,10 +530,26 @@
 
               <div class="form-group" id="grp-date">
                 <label>Ngày khởi hành *</label>
-                <div class="date-picker-wrap">
-                  <input type="text" id="departure_date" placeholder="Chọn ngày khởi hành..." readonly/>
-                  <span class="cal-icon">📅</span>
+
+                <!-- Ngày cố định (có lịch admin) -->
+                <div id="fixedDates" style="display:none">
+                  <div class="fixed-dates-grid" id="datesGrid"></div>
+                  <input type="hidden" id="departure_date"/>
                 </div>
+
+                <!-- Tự chọn ngày (không có lịch cố định) -->
+                <div id="freeDateWrap" style="display:none">
+                  <div class="date-picker-wrap">
+                    <input type="text" id="departure_date_free" placeholder="Chọn ngày khởi hành..." readonly/>
+                    <span class="cal-icon">📅</span>
+                  </div>
+                </div>
+
+                <!-- Đang tải -->
+                <div id="dateLoading" style="color:var(--gray);font-size:.85rem;padding:.5rem 0">
+                  ⏳ Đang tải lịch khởi hành...
+                </div>
+
                 <div class="form-error">Vui lòng chọn ngày khởi hành</div>
               </div>
 
@@ -686,54 +763,105 @@
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  // ===== FLATPICKR CALENDAR =====
-  let datePicker;
-
+  // ===== LOAD LỊCH KHỞI HÀNH =====
   async function initDatePicker() {
-    // Lấy ngày có lịch tour từ database (nếu có)
-    let availableDates = [];
-    try {
-      const res = await fetch(`/api/admin-schedule?month=${new Date().getMonth()+1}&year=${new Date().getFullYear()}`);
-      if (res.ok) {
-        const data = await res.json();
-        availableDates = data.schedules
-          .filter(s => s.tour_id == tourId && !s.is_blocked)
-          .map(s => s.available_date.split('T')[0]);
-      }
-    } catch (e) { /* Không có lịch cố định, cho chọn tự do */ }
+    const loading    = document.getElementById('dateLoading');
+    const fixedDiv   = document.getElementById('fixedDates');
+    const freeDiv    = document.getElementById('freeDateWrap');
+    const datesGrid  = document.getElementById('datesGrid');
 
-    datePicker = flatpickr('#departure_date', {
-      locale: {
-        firstDayOfWeek: 1,
-        weekdays: {
-          shorthand: ['CN','T2','T3','T4','T5','T6','T7'],
-          longhand:  ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy']
-        },
-        months: {
-          shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'],
-          longhand:  ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
-                      'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12']
+    try {
+      const res  = await fetch(`/api/schedule?tour_id=${tourId}`);
+      const data = await res.json();
+
+      loading.style.display = 'none';
+
+      if (data.has_fixed_schedule) {
+        // ── Có lịch cố định → hiển thị các nút ngày ──
+        fixedDiv.style.display = 'block';
+
+        const days = ['CN','T2','T3','T4','T5','T6','T7'];
+        const months = ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'];
+
+        datesGrid.innerHTML = data.available.map(d => {
+          const dt       = new Date(d.available_date);
+          const dayName  = days[dt.getDay()];
+          const dateStr  = `${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()}`;
+          const slots    = d.slots_left;
+          const isFull   = slots <= 0;
+          const isLow    = slots > 0 && slots <= 3;
+
+          const slotsClass = isFull ? 'full' : isLow ? 'low' : 'ok';
+          const slotsText  = isFull ? '🔴 Hết chỗ' : isLow ? `⚡ Còn ${slots} chỗ` : `✅ Còn ${slots} chỗ`;
+          const rawDate    = d.available_date.split('T')[0];
+
+          return `<div class="date-btn ${isFull ? 'full' : ''}"
+                       onclick="${isFull ? '' : `selectDate('${rawDate}', this)`}"
+                       title="${d.note || ''}">
+            <span class="date-day">${dayName}, ${months[dt.getMonth()]}</span>
+            <span class="date-num">${dt.getDate()}</span>
+            <span class="date-slots ${slotsClass}">${slotsText}</span>
+          </div>`;
+        }).join('');
+
+        if (data.available.length === 0) {
+          datesGrid.innerHTML = '<div style="color:var(--gray);font-size:.85rem;grid-column:1/-1">Hiện chưa có lịch khởi hành cho tour này. Vui lòng liên hệ hotline.</div>';
         }
-      },
-      minDate: tomorrow,
-      dateFormat: 'Y-m-d',
-      altInput: true,
-      altFormat: 'D, d/m/Y',
-      disableMobile: true,
-      onDayCreate: function(dObj, dStr, fp, dayElem) {
-        // Đánh dấu ngày có lịch tour
-        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
-        if (availableDates.includes(dateStr)) {
-          dayElem.classList.add('has-tours');
-          dayElem.title = 'Có lịch tour';
-        }
-      },
-      onChange: function(selectedDates) {
-        if (selectedDates.length > 0) {
-          document.getElementById('grp-date').classList.remove('error');
-        }
+
+      } else {
+        // ── Chưa có lịch cố định → dùng flatpickr tự chọn ──
+        freeDiv.style.display = 'block';
+
+        // Hiện thông báo
+        freeDiv.insertAdjacentHTML('beforebegin',
+          `<div class="no-schedule-msg">ℹ️ Tour này có thể đặt theo ngày bạn mong muốn</div>`
+        );
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const allBlocked = [...(data.blocked_all || []), ...(data.blocked_tour || [])];
+
+        flatpickr('#departure_date_free', {
+          locale: {
+            firstDayOfWeek: 1,
+            weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
+            months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
+          },
+          minDate:       tomorrow,
+          disable:       allBlocked,
+          dateFormat:    'Y-m-d',
+          altInput:      true,
+          altFormat:     'D, d/m/Y',
+          disableMobile: true,
+          onChange(selectedDates) {
+            if (selectedDates.length > 0) {
+              document.getElementById('grp-date').classList.remove('error');
+            }
+          }
+        });
       }
-    });
+
+    } catch (e) {
+      // Lỗi API → dùng flatpickr mặc định
+      loading.style.display = 'none';
+      freeDiv.style.display = 'block';
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      flatpickr('#departure_date_free', {
+        minDate: tomorrow, dateFormat: 'Y-m-d',
+        altInput: true, altFormat: 'D, d/m/Y', disableMobile: true
+      });
+    }
+  }
+
+  function selectDate(dateStr, el) {
+    // Bỏ chọn cũ
+    document.querySelectorAll('.date-btn.selected').forEach(b => b.classList.remove('selected'));
+    // Chọn mới
+    el.classList.add('selected');
+    document.getElementById('departure_date').value = dateStr;
+    document.getElementById('grp-date').classList.remove('error');
   }
 
   initDatePicker();
@@ -776,7 +904,8 @@
 
     const name  = document.getElementById('full_name').value.trim();
     const phone = document.getElementById('phone').value.trim();
-    const date  = document.getElementById('departure_date').value;
+    const date  = document.getElementById('departure_date').value ||
+                  document.getElementById('departure_date_free')?.value;
 
     // Tên
     const grpName = document.getElementById('grp-name');
@@ -812,7 +941,8 @@
       phone:          document.getElementById('phone').value.trim().replace(/\s/g, ''),
       email:          document.getElementById('email').value.trim(),
       tour_id:        tourId,
-      departure_date: document.getElementById('departure_date').value,
+      departure_date: document.getElementById('departure_date').value ||
+                      document.getElementById('departure_date_free')?.value,
       num_adults:     parseInt(document.getElementById('num_adults').value),
       num_children:   parseInt(document.getElementById('num_children').value),
       note:           document.getElementById('note').value.trim()
