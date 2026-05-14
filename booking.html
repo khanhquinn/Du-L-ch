@@ -132,21 +132,97 @@
     }
     .schedule-selected-info.show { display: block; }
 
+    .quantity-section {
+      margin-bottom: 1.5rem;
+    }
+    .quantity-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1.8fr 1fr;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      margin-bottom: 0.8rem;
+    }
+    .qty-label {
+      font-size: 0.9rem;
+      color: var(--white);
+      line-height: 1.4;
+    }
+    .qty-label small {
+      font-size: 0.75rem;
+      color: var(--gray);
+      display: block;
+      margin-top: 0.2rem;
+    }
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 3px;
+      background: rgba(255,255,255,0.02);
+      overflow: hidden;
+    }
+    .qty-btn {
+      background: transparent;
+      border: none;
+      color: var(--gold-light);
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-btn:hover {
+      background: rgba(201,168,76,0.15);
+    }
+    .qty-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-left: 1px solid rgba(201,168,76,0.2);
+      border-right: 1px solid rgba(201,168,76,0.2);
+      color: var(--white);
+      text-align: center;
+      font-size: 0.95rem;
+      padding: 0.5rem;
+      font-weight: 500;
+    }
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .qty-input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .qty-price {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--gold-light);
+    }
+    .qty-price strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1rem;
+    }
+
     @media (max-width: 600px) {
-      .month-tab { font-size: .72rem; padding: .55rem .25rem; }
-      .schedule-header { display: none; }
-      .schedule-row {
-        grid-template-columns: 1fr auto;
-        grid-template-areas:
-          "date  price"
-          "class action";
-        gap: .5rem .8rem;
-        padding: .9rem;
+      .quantity-row {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
       }
-      .row-date    { grid-area: date; }
-      .row-class   { grid-area: class; font-size: .75rem; color: var(--gray); }
-      .row-price   { grid-area: price; text-align: right; font-size: 1rem; }
-      .row-action  { grid-area: action; }
+      .qty-price {
+        text-align: left;
+      }
     }
 
     /* ===== BOOKING PAGE STYLES ===== */
@@ -589,33 +665,53 @@
                 <div class="form-error" style="margin-top:.5rem">Vui lòng chọn ngày khởi hành</div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group" id="grp-adults">
-                  <label>Số người lớn *</label>
-                  <select id="num_adults">
-                    <option value="1">1 người</option>
-                    <option value="2">2 người</option>
-                    <option value="3">3 người</option>
-                    <option value="4">4 người</option>
-                    <option value="5">5 người</option>
-                    <option value="6">6 người</option>
-                    <option value="7">7 người</option>
-                    <option value="8">8 người</option>
-                    <option value="9">9 người</option>
-                    <option value="10">10 người</option>
-                  </select>
-                  <div class="form-error">Vui lòng chọn số người lớn</div>
+              <!-- Số lượng khách hàng -->
+              <div class="form-section-title">👥 Số Lượng Khách</div>
+
+              <div class="quantity-section">
+                <!-- Người lớn -->
+                <div class="quantity-row">
+                  <div class="qty-label">
+                    <strong>Người lớn</strong>
+                  </div>
+                  <div class="qty-control">
+                    <button type="button" class="qty-btn qty-minus" onclick="changeQty('adults', -1)">−</button>
+                    <input type="number" id="num_adults" class="qty-input" value="1" min="1" max="20" readonly/>
+                    <button type="button" class="qty-btn qty-plus" onclick="changeQty('adults', 1)">+</button>
+                  </div>
+                  <div class="qty-price">
+                    <strong id="adultPrice">7.490.000đ</strong>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label>Số trẻ em (dưới 12 tuổi)</label>
-                  <select id="num_children">
-                    <option value="0">Không có</option>
-                    <option value="1">1 trẻ em</option>
-                    <option value="2">2 trẻ em</option>
-                    <option value="3">3 trẻ em</option>
-                    <option value="4">4 trẻ em</option>
-                    <option value="5">5 trẻ em</option>
-                  </select>
+
+                <!-- Trẻ em 2-9 tuổi -->
+                <div class="quantity-row">
+                  <div class="qty-label">
+                    <strong>Trẻ em</strong><br/><small>(2-9 tuổi)</small>
+                  </div>
+                  <div class="qty-control">
+                    <button type="button" class="qty-btn qty-minus" onclick="changeQty('children', -1)">−</button>
+                    <input type="number" id="num_children" class="qty-input" value="0" min="0" max="20" readonly/>
+                    <button type="button" class="qty-btn qty-plus" onclick="changeQty('children', 1)">+</button>
+                  </div>
+                  <div class="qty-price">
+                    <strong id="childPrice">–</strong>
+                  </div>
+                </div>
+
+                <!-- Em bé dưới 2 tuổi -->
+                <div class="quantity-row">
+                  <div class="qty-label">
+                    <strong>Em bé</strong><br/><small>(&lt;2 tuổi)</small>
+                  </div>
+                  <div class="qty-control">
+                    <button type="button" class="qty-btn qty-minus" onclick="changeQty('infant', -1)">−</button>
+                    <input type="number" id="num_infant" class="qty-input" value="0" min="0" max="10" readonly/>
+                    <button type="button" class="qty-btn qty-plus" onclick="changeQty('infant', 1)">+</button>
+                  </div>
+                  <div class="qty-price">
+                    <strong style="color:var(--gold-light)">Miễn phí</strong>
+                  </div>
                 </div>
               </div>
 
@@ -631,7 +727,7 @@
                   <span id="adultTotal">–</span>
                 </div>
                 <div class="price-preview-row" id="childRow" style="display:none">
-                  <span id="childLabel">0 trẻ em (70%)</span>
+                  <span id="childLabel">0 trẻ em (80%)</span>
                   <span id="childTotal">–</span>
                 </div>
                 <div class="price-preview-total">
@@ -690,10 +786,10 @@
       duration: '3 ngày 2 đêm',
       maxPeople: 20,
       priceAdult: 2200000,
-      priceChild: 1540000,
       badge: 'Bestseller',
       badgeClass: '',
-      img: 'assets/images/langtam.png'
+      img: 'assets/images/langtam.png',
+      hasFixedSchedule: true
     },
 
     3: {
@@ -702,9 +798,9 @@
       duration: '1 ngày 1 đêm',
       maxPeople: 12,
       priceAdult: 850000,
-      priceChild: 595000,
       badge: null,
-      img: 'assets/images/amthuc.png'
+      img: 'assets/images/amthuc.png',
+      hasFixedSchedule: false
     },
     4: {
       title: 'Hành Trình Lăng Tẩm Triều Nguyễn',
@@ -712,10 +808,10 @@
       duration: '2 ngày 1 đêm',
       maxPeople: 18,
       priceAdult: 1800000,
-      priceChild: 1260000,
       badge: 'Bestseller',
       badgeClass: '',
-      img: 'assets/images/langtamtrieunguyen.jpg'
+      img: 'assets/images/langtamtrieunguyen.jpg',
+      hasFixedSchedule: false
     },
     5: {
       title: 'Lăng Cô – Đèo Hải Vân – Bãi Biển Thiên Đường',
@@ -723,9 +819,9 @@
       duration: '2 ngày 1 đêm',
       maxPeople: 20,
       priceAdult: 1650000,
-      priceChild: 1155000,
       badge: null,
-      img: 'assets/images/langco.jpg'
+      img: 'assets/images/langco.jpg',
+      hasFixedSchedule: true
     },
     6: {
       title: 'Hành Hương Chùa Huế – Tâm Linh Cố Đô',
@@ -733,21 +829,65 @@
       duration: '1 ngày',
       maxPeople: 25,
       priceAdult: 650000,
-      priceChild: 455000,
       badge: null,
-      img: 'assets/images/chuaHue.png'
+      img: 'assets/images/chuaHue.png',
+      hasFixedSchedule: false
     },
 
     8: {
-      title: 'Đêm Hoàng Cung – Ánh Sáng & Nghệ Thuật',
-      destination: 'Hoàng Thành Huế – Ban Đêm',
-      duration: '1 buổi tối',
-      maxPeople: 50,
-      priceAdult: 720000,
-      priceChild: 504000,
-      badge: 'Mới',
-      badgeClass: 'new',
-      img: 'assets/images/demhoagcung.jpg'
+      title: 'Khám Phá Đầm Phá Tam Giang',
+      destination: 'Phá Tam Giang – Huế',
+      duration: '1 ngày 1 đêm',
+      maxPeople: 12,
+      priceAdult: 1200000,
+      badge: null,
+      img: 'assets/images/phatamgiang.png',
+      hasFixedSchedule: true
+    },
+
+    9: {
+      title: 'Chinh Phục Bạch Mã – Thiên Đường Xanh',
+      destination: 'Vườn Quốc Gia Bạch Mã',
+      duration: '2 ngày 1 đêm',
+      maxPeople: 10,
+      priceAdult: 1500000,
+      badge: null,
+      img: 'assets/images/bachma.png',
+      hasFixedSchedule: false
+    },
+
+    11: {
+      title: 'Huế 1 Ngày – Tour Ghép Tiết Kiệm',
+      destination: 'Huế – Tổng Hợp',
+      duration: '1 ngày',
+      maxPeople: 30,
+      priceAdult: 750000,
+      badge: null,
+      img: 'assets/images/tour1day.png',
+      hasFixedSchedule: false
+    },
+
+    12: {
+      title: 'Đạp Xe Xuyên Làng Huế – Trải Nghiệm Xanh',
+      destination: 'Các Làng Xung Quanh Huế',
+      duration: '1 ngày',
+      maxPeople: 12,
+      priceAdult: 500000,
+      badge: null,
+      img: 'assets/images/langtam.png',
+      hasFixedSchedule: false
+    },
+
+    14: {
+      title: 'Huế – Đà Nẵng – Hội An: Tuyến Bộ Lịch Sử',
+      destination: 'Huế – ĐN – Hội An',
+      duration: '4 ngày 3 đêm',
+      maxPeople: 20,
+      priceAdult: 3200000,
+      badge: 'Bestseller',
+      badgeClass: '',
+      img: 'assets/images/huednha.png',
+      hasFixedSchedule: true
     }
   };
 
@@ -855,21 +995,47 @@
     return n.toLocaleString('vi-VN') + 'đ';
   }
 
+  // ===== QUẢN LÝ LƯỢNG KHÁCH =====
+  function changeQty(type, delta) {
+    const input = type === 'adults' ? document.getElementById('num_adults') :
+                  type === 'children' ? document.getElementById('num_children') :
+                  document.getElementById('num_infant');
+    const current = parseInt(input.value) || 0;
+    const newVal = Math.max(0, current + delta);
+    input.value = newVal;
+    updatePrice();
+  }
+
   function updatePrice() {
     const adults   = parseInt(document.getElementById('num_adults').value) || 1;
-    const children = parseInt(document.getElementById('num_children').value) || 0;
+    const children = parseInt(document.getElementById('num_children').value) || 0;  // 2-9 tuổi = 80%
+    const infants  = parseInt(document.getElementById('num_infant').value) || 0;    // <2 tuổi = miễn phí
 
+    // Tính giá: Adults 100%, Children 2-9 = 80%, Infants = 0%
+    const priceChildren = Math.round(tour.priceAdult * 0.8);
+    
     const adultTotal = tour.priceAdult * adults;
-    const childTotal = tour.priceChild * children;
-    const grand      = adultTotal + childTotal;
+    const childTotal = priceChildren * children;
+    const infantTotal = 0; // Em bé miễn phí
+    const grand = adultTotal + childTotal + infantTotal;
 
+    // Cập nhật giá từng loại ở bên phải
+    document.getElementById('adultPrice').textContent = formatPrice(tour.priceAdult);
+    
+    if (children > 0) {
+      document.getElementById('childPrice').textContent = formatPrice(priceChildren);
+    } else {
+      document.getElementById('childPrice').textContent = '–';
+    }
+
+    // Cập nhật tóm tắt giá
     document.getElementById('adultLabel').textContent = adults + ' người lớn';
     document.getElementById('adultTotal').textContent = formatPrice(adultTotal);
 
     const childRow = document.getElementById('childRow');
     if (children > 0) {
       childRow.style.display = 'flex';
-      document.getElementById('childLabel').textContent = children + ' trẻ em (70%)';
+      document.getElementById('childLabel').textContent = children + ' trẻ em (80%)';
       document.getElementById('childTotal').textContent = formatPrice(childTotal);
     } else {
       childRow.style.display = 'none';
@@ -880,6 +1046,7 @@
 
   document.getElementById('num_adults').addEventListener('change', updatePrice);
   document.getElementById('num_children').addEventListener('change', updatePrice);
+  document.getElementById('num_infant').addEventListener('change', updatePrice);
   updatePrice();
 
   // ===== VALIDATE =====
@@ -927,6 +1094,7 @@
       departure_date: document.getElementById('departure_date').value,
       num_adults:     parseInt(document.getElementById('num_adults').value),
       num_children:   parseInt(document.getElementById('num_children').value),
+      num_infant:     parseInt(document.getElementById('num_infant').value) || 0,
       note:           document.getElementById('note').value.trim()
     };
 
