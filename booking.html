@@ -7,8 +7,46 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
-    /* ===== SCHEDULE TABLE (BẢNG GIÁ THEO THÁNG) ===== */
+    /* ===== FLATPICKR DARK THEME ===== */
+    .flatpickr-calendar {
+      background: #1a1a1a !important;
+      border: 1px solid rgba(201,168,76,0.3) !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
+      border-radius: 6px !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
+    .flatpickr-months { background: #111 !important; border-radius: 6px 6px 0 0; padding: .5rem 0; }
+    .flatpickr-month { color: #e2c97e !important; }
+    .flatpickr-current-month { color: #e2c97e !important; font-size: 1rem !important; }
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+      background: #111 !important; color: #e2c97e !important;
+    }
+    .flatpickr-current-month input.cur-year { color: #e2c97e !important; }
+    .flatpickr-prev-month, .flatpickr-next-month { color: #c9a84c !important; fill: #c9a84c !important; }
+    .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill: #e2c97e !important; }
+    .flatpickr-weekday { color: #888 !important; background: #111 !important; font-size: .72rem; }
+    .flatpickr-day { color: #d8d2c8 !important; border-radius: 4px !important; }
+    .flatpickr-day:hover { background: rgba(201,168,76,.15) !important; border-color: rgba(201,168,76,.3) !important; }
+    .flatpickr-day.selected, .flatpickr-day.selected:hover {
+      background: #c9a84c !important; border-color: #c9a84c !important; color: #0a0a0a !important; font-weight: 600;
+    }
+    .flatpickr-day.today { border-color: rgba(201,168,76,.5) !important; }
+    .flatpickr-day.today:hover { background: rgba(201,168,76,.2) !important; }
+    .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover {
+      color: #333 !important; text-decoration: line-through; cursor: not-allowed;
+    }
+    .flatpickr-input { cursor: pointer !important; }
+    .flatpickr-input[readonly] { cursor: pointer !important; }
+    
+    /* Calendar wrapper */
+    .date-picker-wrap { position: relative; margin-bottom: 1rem; }
+    .date-picker-wrap .cal-icon {
+      position: absolute; right: .9rem; top: 50%; transform: translateY(-50%);
+      color: #888; pointer-events: none; font-size: 1rem;
+    }
+  </style>
     .schedule-title {
       font-family: var(--font-display);
       font-size: 1.15rem;
@@ -640,24 +678,33 @@
                 <div class="schedule-title">Bảng giá</div>
                 <div class="schedule-subtitle">(Khởi hành từ Huế) – Chọn ngày khởi hành <span style="color:var(--gold-light)">*</span></div>
 
-                <!-- Tab tháng -->
-                <div class="month-tabs">
-                  <button type="button" class="month-tab active" data-month="all">Tất cả</button>
-                  <button type="button" class="month-tab" data-month="5">Tháng 5</button>
-                  <button type="button" class="month-tab" data-month="6">Tháng 6</button>
-                  <button type="button" class="month-tab" data-month="7">Tháng 7</button>
-                  <button type="button" class="month-tab" data-month="8">Tháng 8</button>
+                <!-- FIXED SCHEDULE: Tab tháng + Bảng lịch -->
+                <div id="fixedScheduleSection" style="display:none">
+                  <div class="month-tabs">
+                    <button type="button" class="month-tab active" data-month="all">Tất cả</button>
+                    <button type="button" class="month-tab" data-month="5">Tháng 5</button>
+                    <button type="button" class="month-tab" data-month="6">Tháng 6</button>
+                    <button type="button" class="month-tab" data-month="7">Tháng 7</button>
+                    <button type="button" class="month-tab" data-month="8">Tháng 8</button>
+                  </div>
+
+                  <div class="schedule-table">
+                    <div class="schedule-header">
+                      <span>Ngày khởi hành</span>
+                      <span>Hạng tour</span>
+                      <span>Giá tour</span>
+                      <span></span>
+                    </div>
+                    <div id="scheduleList"></div>
+                  </div>
                 </div>
 
-                <!-- Bảng lịch -->
-                <div class="schedule-table">
-                  <div class="schedule-header">
-                    <span>Ngày khởi hành</span>
-                    <span>Hạng tour</span>
-                    <span>Giá tour</span>
-                    <span></span>
+                <!-- FLEXIBLE SCHEDULE: Calendar Picker -->
+                <div id="flexibleScheduleSection" style="display:none">
+                  <div class="date-picker-wrap">
+                    <input type="text" id="departure_date_calendar" placeholder="Chọn ngày khởi hành..." readonly/>
+                    <span class="cal-icon">📅</span>
                   </div>
-                  <div id="scheduleList"></div>
                 </div>
 
                 <input type="hidden" id="departure_date"/>
@@ -978,17 +1025,65 @@
     info.classList.add('show');
   }
 
-  // Tab tháng
-  document.querySelectorAll('.month-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderSchedule(btn.dataset.month);
-    });
-  });
+  // ===== INIT DATE PICKER (Fixed vs Flexible) =====
+  function initDatePicker() {
+    const isFixedSchedule = tour.hasFixedSchedule === true;
+    const fixedSection = document.getElementById('fixedScheduleSection');
+    const flexibleSection = document.getElementById('flexibleScheduleSection');
 
-  // Khởi tạo: hiển thị tất cả
-  renderSchedule('all');
+    if (isFixedSchedule) {
+      // ──── FIXED SCHEDULE: Show month tabs ────
+      fixedSection.style.display = 'block';
+      flexibleSection.style.display = 'none';
+
+      // Tab tháng
+      document.querySelectorAll('.month-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderSchedule(btn.dataset.month);
+        });
+      });
+
+      renderSchedule('all');
+
+    } else {
+      // ──── FLEXIBLE SCHEDULE: Show calendar ────
+      fixedSection.style.display = 'none';
+      flexibleSection.style.display = 'block';
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // Init flatpickr calendar
+      flatpickr('#departure_date_calendar', {
+        locale: {
+          firstDayOfWeek: 1,
+          weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
+          months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
+        },
+        minDate: tomorrow,
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        disableMobile: true,
+        onChange(selectedDates) {
+          if (selectedDates.length > 0) {
+            const dateStr = selectedDates[0].toISOString().split('T')[0];
+            document.getElementById('departure_date').value = dateStr;
+            document.getElementById('grp-date').classList.remove('error');
+
+            const info = document.getElementById('selectedInfo');
+            info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
+            info.classList.add('show');
+          }
+        }
+      });
+    }
+  }
+
+  // Khởi tạo date picker khi trang load
+  initDatePicker();
 
   // ===== TÍNH TIỀN =====
   function formatPrice(n) {
@@ -1126,6 +1221,7 @@
     }
   });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 </body>
 </html>
