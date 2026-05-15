@@ -1058,53 +1058,48 @@
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // ── Fetch blocked dates từ API ──
-      let blockedDates = [];
+      // ── Init calendar ngay (không chờ API) ──
+      let calendarInstance = flatpickr('#departure_date_calendar', {
+        locale: {
+          firstDayOfWeek: 1,
+          weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
+          months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
+        },
+        minDate: tomorrow,
+        disable: [],  // Mặc định không block gì, sau đó update từ API
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        disableMobile: true,
+        onChange(selectedDates) {
+          if (selectedDates.length > 0) {
+            const dateStr = selectedDates[0].toISOString().split('T')[0];
+            document.getElementById('departure_date').value = dateStr;
+            document.getElementById('grp-date').classList.remove('error');
+
+            const info = document.getElementById('selectedInfo');
+            info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
+            info.classList.add('show');
+          }
+        }
+      });
+
+      // ── Fetch blocked dates từ API để update calendar ──
       fetch(`/api/schedule?tour_id=${tourId}`)
         .then(res => res.json())
         .then(data => {
-          // Lấy ngày bị khoá toàn bộ + ngày khoá tour này
-          blockedDates = [
+          const blockedDates = [
             ...(data.blocked_all || []),
             ...(data.blocked_tour || [])
           ];
-          console.log('Blocked dates:', blockedDates);
-          
-          // Re-init flatpickr với blocked dates
-          initCalendar(blockedDates);
+          if (blockedDates.length > 0) {
+            console.log('Updating blocked dates:', blockedDates);
+            calendarInstance.set('disable', blockedDates);
+          }
         })
         .catch(err => {
-          console.log('Cannot fetch blocked dates, showing calendar without blocks');
-          initCalendar([]);
+          console.log('⚠ API blocked dates not available, calendar showing all dates');
         });
-
-      function initCalendar(disabledDates) {
-        // Init flatpickr calendar
-        flatpickr('#departure_date_calendar', {
-          locale: {
-            firstDayOfWeek: 1,
-            weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
-            months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
-          },
-          minDate: tomorrow,
-          disable: disabledDates,  // ← Disable blocked dates
-          dateFormat: 'Y-m-d',
-          altInput: true,
-          altFormat: 'd/m/Y',
-          disableMobile: true,
-          onChange(selectedDates) {
-            if (selectedDates.length > 0) {
-              const dateStr = selectedDates[0].toISOString().split('T')[0];
-              document.getElementById('departure_date').value = dateStr;
-              document.getElementById('grp-date').classList.remove('error');
-
-              const info = document.getElementById('selectedInfo');
-              info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
-              info.classList.add('show');
-            }
-          }
-        });
-      }
     }
   }
 
