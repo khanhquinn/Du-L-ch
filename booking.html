@@ -7,122 +7,78 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
   <style>
-    /* ===== CUSTOM CALENDAR (tour tự chọn ngày) ===== */
+    /* ===== FLATPICKR DARK THEME ===== */
+    .flatpickr-calendar {
+      background: #1a1a1a !important;
+      border: 1px solid rgba(201,168,76,0.3) !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
+      border-radius: 6px !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
+    .flatpickr-months { background: #111 !important; border-radius: 6px 6px 0 0; padding: .5rem 0; }
+    .flatpickr-month { color: #e2c97e !important; }
+    .flatpickr-current-month { color: #e2c97e !important; font-size: 1rem !important; }
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+      background: #111 !important; color: #e2c97e !important;
+    }
+    .flatpickr-current-month input.cur-year { color: #e2c97e !important; }
+    .flatpickr-prev-month, .flatpickr-next-month { color: #c9a84c !important; fill: #c9a84c !important; }
+    .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill: #e2c97e !important; }
+    .flatpickr-weekday { color: #888 !important; background: #111 !important; font-size: .72rem; }
+    .flatpickr-day { color: #d8d2c8 !important; border-radius: 4px !important; }
+    .flatpickr-day:hover { background: rgba(201,168,76,.15) !important; border-color: rgba(201,168,76,.3) !important; }
+    .flatpickr-day.selected, .flatpickr-day.selected:hover {
+      background: #c9a84c !important; border-color: #c9a84c !important; color: #0a0a0a !important; font-weight: 600;
+    }
+    .flatpickr-day.today { border-color: rgba(201,168,76,.5) !important; }
+    .flatpickr-day.today:hover { background: rgba(201,168,76,.2) !important; }
+    .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover {
+      color: #333 !important; text-decoration: line-through; cursor: not-allowed;
+    }
+    .flatpickr-input { cursor: pointer !important; }
+    .flatpickr-input[readonly] { cursor: pointer !important; }
+
+    /* ===== INLINE CALENDAR (cho tour tự chọn ngày) ===== */
     .inline-calendar-label {
       font-size: 0.85rem;
       color: var(--gold-light);
       margin-bottom: 0.8rem;
       font-weight: 500;
     }
-    .custom-calendar {
-      background: #1a1a1a;
-      border: 1px solid rgba(201,168,76,0.3);
-      border-radius: 6px;
-      padding: 1rem;
-      font-family: 'DM Sans', sans-serif;
-      user-select: none;
+    .hidden-input {
+      height: 0 !important;
+      width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
     }
-    .cal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      padding-bottom: 0.7rem;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+    /* Force inline calendar to display */
+    .flatpickr-calendar.inline {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+      top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-shadow: none !important;
+      margin-top: 0 !important;
     }
-    .cal-nav-btn {
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.3);
-      color: #e2c97e;
-      width: 32px;
-      height: 32px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
+    .flatpickr-calendar.inline .flatpickr-days,
+    .flatpickr-calendar.inline .dayContainer {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 100% !important;
     }
-    .cal-nav-btn:hover {
-      background: rgba(201,168,76,0.25);
-    }
-    .cal-nav-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-    .cal-title {
-      color: #e2c97e;
-      font-size: 1.05rem;
-      font-weight: 500;
-      font-family: 'Playfair Display', serif;
-    }
-    .cal-weekdays {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      margin-bottom: 6px;
-    }
-    .cal-weekday {
-      text-align: center;
-      color: #888;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.4rem 0;
-      font-weight: 500;
-    }
-    .cal-days {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
-    .cal-day {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #d8d2c8;
-      font-size: 0.9rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s;
-      border: 1px solid transparent;
-      min-height: 40px;
-    }
-    .cal-day:hover:not(.disabled):not(.empty) {
-      background: rgba(201,168,76,0.15);
-      border-color: rgba(201,168,76,0.3);
-    }
-    .cal-day.today {
-      border-color: rgba(201,168,76,0.5);
-      font-weight: 600;
-    }
-    .cal-day.selected {
-      background: #c9a84c !important;
-      color: #0a0a0a !important;
-      font-weight: 600;
-      border-color: #c9a84c !important;
-    }
-    .cal-day.disabled {
-      color: #333;
-      text-decoration: line-through;
-      cursor: not-allowed;
-    }
-    .cal-day.empty {
-      cursor: default;
-    }
-    .cal-day.blocked {
-      color: #555;
-      background: rgba(220,38,38,0.05);
-      cursor: not-allowed;
-      text-decoration: line-through;
-    }
-    @media (max-width: 600px) {
-      .cal-day { font-size: 0.85rem; min-height: 36px; }
-      .cal-title { font-size: 0.95rem; }
+    .flatpickr-calendar.inline .flatpickr-day {
+      max-width: 14.28% !important;
+      height: 42px !important;
+      line-height: 42px !important;
     }
     
     /* Calendar wrapper */
@@ -787,10 +743,10 @@
                   </div>
                 </div>
 
-                <!-- FLEXIBLE SCHEDULE: Custom Calendar -->
+                <!-- FLEXIBLE SCHEDULE: Calendar Picker (INLINE) -->
                 <div id="flexibleScheduleSection" style="display:none">
                   <div class="inline-calendar-label">📅 Chọn ngày khởi hành trên lịch:</div>
-                  <div id="customCalendar" class="custom-calendar"></div>
+                  <input type="text" id="departure_date_calendar" class="hidden-input" readonly/>
                 </div>
 
                 <input type="hidden" id="departure_date"/>
@@ -1134,159 +1090,78 @@
       renderSchedule('all');
 
     } else {
-      // ──── FLEXIBLE SCHEDULE: Custom Calendar ────
+      // ──── FLEXIBLE SCHEDULE: Show calendar ────
       fixedSection.style.display = 'none';
       flexibleSection.style.display = 'block';
 
-      // ── Fetch blocked dates from API (optional) ──
-      let blockedDates = [];
-      
-      fetch(`/api/schedule?tour_id=${tourId}`)
-        .then(res => res.json())
-        .then(data => {
-          blockedDates = [
-            ...(data.blocked_all || []),
-            ...(data.blocked_tour || [])
-          ];
-          console.log('Blocked dates:', blockedDates);
-          renderCustomCalendar();  // Re-render với blocked dates
-        })
-        .catch(err => {
-          console.log('⚠ API không có, calendar không block ngày nào');
-          renderCustomCalendar();
+      // ── Check flatpickr loaded ──
+      if (typeof flatpickr === 'undefined') {
+        console.error('❌ Flatpickr không load được!');
+        flexibleSection.innerHTML = '<div class="inline-calendar-label">📅 Chọn ngày khởi hành:</div><input type="date" id="departure_date_fallback" min="' + new Date(Date.now() + 86400000).toISOString().split('T')[0] + '" style="width:100%; padding:.8rem; background:var(--dark2); color:var(--white); border:1px solid rgba(201,168,76,.3); border-radius:4px; font-size:1rem;"/>';
+        document.getElementById('departure_date_fallback').addEventListener('change', e => {
+          document.getElementById('departure_date').value = e.target.value;
+          const info = document.getElementById('selectedInfo');
+          info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(e.target.value);
+          info.classList.add('show');
         });
+        return;
+      }
 
-      // Initial render (trước khi fetch xong)
-      renderCustomCalendar();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-      function renderCustomCalendar() {
-        const calendar = document.getElementById('customCalendar');
-        if (!calendar) return;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        // State: current displayed month + selected date
-        if (!window._calState) {
-          window._calState = {
-            year: today.getFullYear(),
-            month: today.getMonth(),
-            selected: null
-          };
-        }
-
-        const state = window._calState;
-        const monthNames = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
-                            'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
-
-        // Render
-        function draw() {
-          const firstDay = new Date(state.year, state.month, 1);
-          const lastDay = new Date(state.year, state.month + 1, 0);
-          const startDayOfWeek = (firstDay.getDay() + 6) % 7;  // Monday = 0
-          const daysInMonth = lastDay.getDate();
-
-          // Disable prev nav if showing current month
-          const canGoPrev = !(state.year === today.getFullYear() && state.month === today.getMonth());
-
-          let html = `
-            <div class="cal-header">
-              <button class="cal-nav-btn" id="calPrev" ${!canGoPrev ? 'disabled' : ''}>‹</button>
-              <div class="cal-title">${monthNames[state.month]} ${state.year}</div>
-              <button class="cal-nav-btn" id="calNext">›</button>
-            </div>
-            <div class="cal-weekdays">
-              <div class="cal-weekday">T2</div>
-              <div class="cal-weekday">T3</div>
-              <div class="cal-weekday">T4</div>
-              <div class="cal-weekday">T5</div>
-              <div class="cal-weekday">T6</div>
-              <div class="cal-weekday">T7</div>
-              <div class="cal-weekday">CN</div>
-            </div>
-            <div class="cal-days">
-          `;
-
-          // Empty cells before first day
-          for (let i = 0; i < startDayOfWeek; i++) {
-            html += '<div class="cal-day empty"></div>';
-          }
-
-          // Days of month
-          for (let day = 1; day <= daysInMonth; day++) {
-            const dateObj = new Date(state.year, state.month, day);
-            const dateStr = dateObj.getFullYear() + '-' +
-                           String(state.month + 1).padStart(2, '0') + '-' +
-                           String(day).padStart(2, '0');
-
-            let classes = 'cal-day';
-            let isClickable = true;
-
-            // Past or today → disabled
-            if (dateObj < tomorrow) {
-              classes += ' disabled';
-              isClickable = false;
-            }
-            // Blocked by admin → blocked
-            else if (blockedDates.includes(dateStr)) {
-              classes += ' blocked';
-              isClickable = false;
-            }
-            // Today highlight
-            if (dateObj.getTime() === today.getTime()) {
-              classes += ' today';
-            }
-            // Selected highlight
-            if (state.selected === dateStr) {
-              classes += ' selected';
-            }
-
-            html += `<div class="${classes}" ${isClickable ? `data-date="${dateStr}"` : ''}>${day}</div>`;
-          }
-
-          html += '</div>';
-          calendar.innerHTML = html;
-
-          // Bind events
-          document.getElementById('calPrev').addEventListener('click', () => {
-            if (state.month === 0) {
-              state.month = 11;
-              state.year--;
-            } else {
-              state.month--;
-            }
-            draw();
-          });
-
-          document.getElementById('calNext').addEventListener('click', () => {
-            if (state.month === 11) {
-              state.month = 0;
-              state.year++;
-            } else {
-              state.month++;
-            }
-            draw();
-          });
-
-          calendar.querySelectorAll('.cal-day[data-date]').forEach(el => {
-            el.addEventListener('click', () => {
-              const dateStr = el.dataset.date;
-              state.selected = dateStr;
+      try {
+        // ── Init INLINE calendar (luôn hiển thị, không cần click) ──
+        let calendarInstance = flatpickr('#departure_date_calendar', {
+          inline: true,                  // ← Calendar luôn hiển thị
+          appendTo: flexibleSection,     // ← Đặt calendar trong section này
+          locale: {
+            firstDayOfWeek: 1,
+            weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
+            months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
+          },
+          minDate: tomorrow,
+          disable: [],                   // Mặc định không block gì
+          dateFormat: 'Y-m-d',
+          disableMobile: true,
+          onChange(selectedDates) {
+            if (selectedDates.length > 0) {
+              const dateStr = selectedDates[0].toISOString().split('T')[0];
               document.getElementById('departure_date').value = dateStr;
               document.getElementById('grp-date').classList.remove('error');
 
               const info = document.getElementById('selectedInfo');
               info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
               info.classList.add('show');
+            }
+          }
+        });
 
-              draw();
-            });
+        console.log('✓ Flatpickr inline calendar initialized', calendarInstance);
+        // Debug: log calendar element to verify it exists
+        setTimeout(() => {
+          const cal = document.querySelector('.flatpickr-calendar.inline');
+          console.log('Calendar in DOM:', cal, cal ? 'visible: ' + (cal.offsetHeight > 0) : 'NOT FOUND');
+        }, 500);
+
+        // ── Fetch blocked dates từ API để update calendar ──
+        fetch(`/api/schedule?tour_id=${tourId}`)
+          .then(res => res.json())
+          .then(data => {
+            const blockedDates = [
+              ...(data.blocked_all || []),
+              ...(data.blocked_tour || [])
+            ];
+            if (blockedDates.length > 0) {
+              console.log('Updating blocked dates:', blockedDates);
+              calendarInstance.set('disable', blockedDates);
+            }
+          })
+          .catch(err => {
+            console.log('⚠ API blocked dates not available');
           });
-        }
-
-        draw();
+      } catch (err) {
+        console.error('❌ Lỗi khởi tạo flatpickr:', err);
       }
     }
   }
