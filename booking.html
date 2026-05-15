@@ -39,6 +39,32 @@
     }
     .flatpickr-input { cursor: pointer !important; }
     .flatpickr-input[readonly] { cursor: pointer !important; }
+
+    /* ===== INLINE CALENDAR (cho tour tự chọn ngày) ===== */
+    .inline-calendar-label {
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      margin-bottom: 0.8rem;
+      font-weight: 500;
+    }
+    #departure_date_calendar.flatpickr-input + .flatpickr-calendar,
+    .flatpickr-calendar.inline {
+      box-shadow: none !important;
+      border: 1px solid rgba(201,168,76,0.25) !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .flatpickr-calendar.inline .flatpickr-days,
+    .flatpickr-calendar.inline .dayContainer {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 100% !important;
+    }
+    .flatpickr-calendar.inline .flatpickr-day {
+      max-width: 14.28% !important;
+      height: 42px !important;
+      line-height: 42px !important;
+    }
     
     /* Calendar wrapper */
     .date-picker-wrap { position: relative; margin-bottom: 1rem; }
@@ -702,12 +728,10 @@
                   </div>
                 </div>
 
-                <!-- FLEXIBLE SCHEDULE: Calendar Picker -->
+                <!-- FLEXIBLE SCHEDULE: Calendar Picker (INLINE) -->
                 <div id="flexibleScheduleSection" style="display:none">
-                  <div class="date-picker-wrap">
-                    <input type="text" id="departure_date_calendar" placeholder="Chọn ngày khởi hành..." readonly/>
-                    <span class="cal-icon">📅</span>
-                  </div>
+                  <div class="inline-calendar-label">📅 Chọn ngày khởi hành trên lịch:</div>
+                  <div id="departure_date_calendar"></div>
                 </div>
 
                 <input type="hidden" id="departure_date"/>
@@ -1058,18 +1082,17 @@
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // ── Init calendar ngay (không chờ API) ──
+      // ── Init INLINE calendar (luôn hiển thị, không cần click) ──
       let calendarInstance = flatpickr('#departure_date_calendar', {
+        inline: true,                  // ← Calendar luôn hiển thị
         locale: {
           firstDayOfWeek: 1,
           weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
           months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
         },
         minDate: tomorrow,
-        disable: [],  // Mặc định không block gì, sau đó update từ API
+        disable: [],                   // Mặc định không block gì
         dateFormat: 'Y-m-d',
-        altInput: true,
-        altFormat: 'd/m/Y',
         disableMobile: true,
         onChange(selectedDates) {
           if (selectedDates.length > 0) {
