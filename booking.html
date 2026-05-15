@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
   <style>
     /* ===== FLATPICKR DARK THEME ===== */
     .flatpickr-calendar {
@@ -731,7 +733,7 @@
                 <!-- FLEXIBLE SCHEDULE: Calendar Picker (INLINE) -->
                 <div id="flexibleScheduleSection" style="display:none">
                   <div class="inline-calendar-label">📅 Chọn ngày khởi hành trên lịch:</div>
-                  <div id="departure_date_calendar"></div>
+                  <input type="text" id="departure_date_calendar" style="display:none"/>
                 </div>
 
                 <input type="hidden" id="departure_date"/>
@@ -1265,7 +1267,6 @@
     }
   });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 </body>
 </html>
