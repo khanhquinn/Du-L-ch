@@ -194,6 +194,30 @@
     .modal .form-group select:focus { border-color: var(--gold); }
     .modal-footer { display: flex; gap: .8rem; margin-top: 1.5rem; justify-content: flex-end; }
     .btn-modal-cancel { background: var(--dark4); border: 1px solid rgba(255,255,255,.1); color: var(--gray); padding: .6rem 1.2rem; border-radius: 4px; cursor: pointer; font-family: var(--font); }
+
+    /* ═══ UNBLOCK MODAL ═══ */
+    .unblock-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .8rem 1rem;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 6px;
+      margin-bottom: .6rem;
+    }
+    .unblock-item > div:first-child { display: flex; align-items: center; gap: .8rem; }
+    .unblock-icon { font-size: 1.4rem; }
+    .btn-unblock {
+      background: rgba(46, 204, 113, .15);
+      border: 1px solid rgba(46, 204, 113, .4);
+      color: #2ecc71;
+      padding: .45rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: .85rem;
+      transition: background .2s;
+    }
+    .btn-unblock:hover { background: rgba(46, 204, 113, .25); }
     .btn-modal-save   { background: var(--gold); color: var(--dark); border: none; padding: .6rem 1.5rem; border-radius: 4px; cursor: pointer; font-family: var(--font); font-weight: 600; }
 
     /* ── RECENT ────────────────────────────── */
@@ -478,6 +502,25 @@
 </div>
 
 <!-- ══ MODAL HUỶ BOOKING ══════════════════════════════════ -->
+<!-- ═══ UNBLOCK MODAL ═══ -->
+<div class="modal-overlay" id="unblockModal">
+  <div class="modal-content" style="max-width:520px">
+    <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.08); padding-bottom:.8rem; margin-bottom:1rem">
+      <h3 style="font-family:var(--font-display); color:#e2c97e; font-size:1.1rem">
+        🔓 Mở khoá ngày
+      </h3>
+      <p id="unblockDateLabel" style="color:var(--gray); font-size:.85rem; margin-top:.3rem"></p>
+    </div>
+    <div id="unblockList" style="margin-bottom:1rem"></div>
+    <div class="modal-actions" style="display:flex; gap:.6rem; justify-content:flex-end">
+      <button class="btn-modal-cancel" onclick="closeModal('unblockModal')">Đóng</button>
+      <button class="btn-modal-save" id="btnUnblockAll" style="background:var(--orange);display:none">
+        🔓 Mở khoá tất cả
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="cancelModal">
   <div class="modal">
     <h3>Huỷ Booking #<span id="cancelId"></span></h3>
@@ -501,6 +544,7 @@ let calYear  = new Date().getFullYear();
 let calMonth = new Date().getMonth() + 1;
 let allTours = [];
 let cancelBookingId = null;
+let dayInfoMap = {};  // ← Lưu thông tin từng ngày (block/schedule)
 
 // ── AUTH ──────────────────────────────────────────────────
 async function doLogin() {
@@ -807,6 +851,19 @@ async function renderCalendar() {
     });
     const blockedSet = new Set(data.blocked.map(b => b.blocked_date.split('T')[0]));
 
+    // ── Build dayInfoMap: chứa đầy đủ thông tin để mở khoá ──
+    dayInfoMap = {};
+    data.blocked.forEach(b => {
+      const d = b.blocked_date.split('T')[0];
+      if (!dayInfoMap[d]) dayInfoMap[d] = { blockedAll: null, schedules: [] };
+      dayInfoMap[d].blockedAll = b;  // { id, blocked_date, reason }
+    });
+    data.schedules.forEach(s => {
+      const d = s.available_date.split('T')[0];
+      if (!dayInfoMap[d]) dayInfoMap[d] = { blockedAll: null, schedules: [] };
+      dayInfoMap[d].schedules.push(s);  // { id, tour_id, tour_title, is_blocked, max_people, note }
+    });
+
     let html = '';
     // Ô trống đầu tháng
     for (let i = 0; i < firstDay; i++) html += '<div class="cal-day other-month"></div>';
@@ -842,12 +899,123 @@ function changeMonth(dir) {
 }
 
 function onDayClick(dateStr) {
-  document.getElementById('scheduleDate').value = dateStr;
-  openAddModal();
+  const info = dayInfoMap[dateStr];
+  const hasBlockAll  = info && info.blockedAll;
+  const hasTourBlock = info && info.schedules.some(s => s.is_blocked);
+
+  if (hasBlockAll || hasTourBlock) {
+    // Có ngày bị khoá → mở modal Mở Khoá
+    openUnblockModal(dateStr);
+  } else {
+    // Chưa khoá → mở modal Thêm Lịch / Khoá Ngày
+    document.getElementById('scheduleDate').value = dateStr;
+    openAddModal();
+  }
 }
 
 function openAddModal() {
   document.getElementById('addModal').classList.add('open');
+}
+
+// ═══════════════ UNBLOCK FUNCTIONS ═══════════════
+function openUnblockModal(dateStr) {
+  const info = dayInfoMap[dateStr] || { blockedAll: null, schedules: [] };
+  const blockedTours = info.schedules.filter(s => s.is_blocked);
+
+  // Format ngày
+  const [y, m, d] = dateStr.split('-');
+  const dateVN = `${d}/${m}/${y}`;
+
+  document.getElementById('unblockDateLabel').textContent = `Ngày ${dateVN}`;
+
+  // Render danh sách block
+  const list = document.getElementById('unblockList');
+  let html = '';
+
+  if (info.blockedAll) {
+    html += `
+      <div class="unblock-item">
+        <div>
+          <div class="unblock-icon">🚫</div>
+          <div>
+            <strong>Khoá toàn bộ tour</strong>
+            ${info.blockedAll.reason ? `<small style="color:var(--gray);display:block">Lý do: ${info.blockedAll.reason}</small>` : ''}
+          </div>
+        </div>
+        <button class="btn-unblock" onclick="unblockOne('block', ${info.blockedAll.id}, '${dateStr}')">🔓 Mở khoá</button>
+      </div>
+    `;
+  }
+
+  blockedTours.forEach(s => {
+    html += `
+      <div class="unblock-item">
+        <div>
+          <div class="unblock-icon">🔒</div>
+          <div>
+            <strong>${s.tour_title || 'Tour ' + s.tour_id}</strong>
+            ${s.note ? `<small style="color:var(--gray);display:block">${s.note}</small>` : ''}
+          </div>
+        </div>
+        <button class="btn-unblock" onclick="unblockOne('tour', ${s.id}, '${dateStr}')">🔓 Mở khoá</button>
+      </div>
+    `;
+  });
+
+  list.innerHTML = html || '<p style="color:var(--gray);text-align:center;padding:1rem">Không có khoá nào</p>';
+
+  // Show button "Mở khoá tất cả" nếu có >= 2 blocks
+  const totalBlocks = (info.blockedAll ? 1 : 0) + blockedTours.length;
+  document.getElementById('btnUnblockAll').style.display = totalBlocks >= 2 ? 'block' : 'none';
+  document.getElementById('btnUnblockAll').onclick = () => unblockAllForDate(dateStr);
+
+  document.getElementById('unblockModal').classList.add('open');
+}
+
+async function unblockOne(type, id, dateStr) {
+  if (!confirm('Bạn có chắc muốn mở khoá?')) return;
+  try {
+    await fetch('/api/admin-schedule', {
+      method: 'DELETE',
+      headers: authHeaders(),
+      body: JSON.stringify({ type, id })
+    });
+    showToast('🔓 Đã mở khoá!');
+    closeModal('unblockModal');
+    renderCalendar();
+  } catch (e) {
+    showToast('Lỗi khi mở khoá', 'error');
+  }
+}
+
+async function unblockAllForDate(dateStr) {
+  if (!confirm('Bạn có chắc muốn mở khoá TẤT CẢ trên ngày này?')) return;
+  const info = dayInfoMap[dateStr] || { blockedAll: null, schedules: [] };
+  const blockedTours = info.schedules.filter(s => s.is_blocked);
+
+  try {
+    const promises = [];
+    if (info.blockedAll) {
+      promises.push(fetch('/api/admin-schedule', {
+        method: 'DELETE',
+        headers: authHeaders(),
+        body: JSON.stringify({ type: 'block', id: info.blockedAll.id })
+      }));
+    }
+    blockedTours.forEach(s => {
+      promises.push(fetch('/api/admin-schedule', {
+        method: 'DELETE',
+        headers: authHeaders(),
+        body: JSON.stringify({ type: 'tour', id: s.id })
+      }));
+    });
+    await Promise.all(promises);
+    showToast(`🔓 Đã mở khoá ${promises.length} mục!`);
+    closeModal('unblockModal');
+    renderCalendar();
+  } catch (e) {
+    showToast('Lỗi khi mở khoá', 'error');
+  }
 }
 
 function toggleScheduleType() {
