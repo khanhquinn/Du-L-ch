@@ -7,9 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
   <style>
     /* ===== FLATPICKR DARK THEME ===== */
     .flatpickr-calendar {
@@ -49,12 +48,26 @@
       margin-bottom: 0.8rem;
       font-weight: 500;
     }
-    #departure_date_calendar.flatpickr-input + .flatpickr-calendar,
+    .hidden-input {
+      height: 0 !important;
+      width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    /* Force inline calendar to display */
     .flatpickr-calendar.inline {
-      box-shadow: none !important;
-      border: 1px solid rgba(201,168,76,0.25) !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+      top: 0 !important;
       width: 100% !important;
       max-width: 100% !important;
+      box-shadow: none !important;
+      margin-top: 0 !important;
     }
     .flatpickr-calendar.inline .flatpickr-days,
     .flatpickr-calendar.inline .dayContainer {
@@ -733,7 +746,7 @@
                 <!-- FLEXIBLE SCHEDULE: Calendar Picker (INLINE) -->
                 <div id="flexibleScheduleSection" style="display:none">
                   <div class="inline-calendar-label">📅 Chọn ngày khởi hành trên lịch:</div>
-                  <input type="text" id="departure_date_calendar" style="display:none"/>
+                  <input type="text" id="departure_date_calendar" class="hidden-input" readonly/>
                 </div>
 
                 <input type="hidden" id="departure_date"/>
@@ -1081,55 +1094,81 @@
       fixedSection.style.display = 'none';
       flexibleSection.style.display = 'block';
 
+      // ── Check flatpickr loaded ──
+      if (typeof flatpickr === 'undefined') {
+        console.error('❌ Flatpickr không load được!');
+        flexibleSection.innerHTML = '<div class="inline-calendar-label">📅 Chọn ngày khởi hành:</div><input type="date" id="departure_date_fallback" min="' + new Date(Date.now() + 86400000).toISOString().split('T')[0] + '" style="width:100%; padding:.8rem; background:var(--dark2); color:var(--white); border:1px solid rgba(201,168,76,.3); border-radius:4px; font-size:1rem;"/>';
+        document.getElementById('departure_date_fallback').addEventListener('change', e => {
+          document.getElementById('departure_date').value = e.target.value;
+          const info = document.getElementById('selectedInfo');
+          info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(e.target.value);
+          info.classList.add('show');
+        });
+        return;
+      }
+
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // ── Init INLINE calendar (luôn hiển thị, không cần click) ──
-      let calendarInstance = flatpickr('#departure_date_calendar', {
-        inline: true,                  // ← Calendar luôn hiển thị
-        locale: {
-          firstDayOfWeek: 1,
-          weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
-          months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
-        },
-        minDate: tomorrow,
-        disable: [],                   // Mặc định không block gì
-        dateFormat: 'Y-m-d',
-        disableMobile: true,
-        onChange(selectedDates) {
-          if (selectedDates.length > 0) {
-            const dateStr = selectedDates[0].toISOString().split('T')[0];
-            document.getElementById('departure_date').value = dateStr;
-            document.getElementById('grp-date').classList.remove('error');
+      try {
+        // ── Init INLINE calendar (luôn hiển thị, không cần click) ──
+        let calendarInstance = flatpickr('#departure_date_calendar', {
+          inline: true,                  // ← Calendar luôn hiển thị
+          appendTo: flexibleSection,     // ← Đặt calendar trong section này
+          locale: {
+            firstDayOfWeek: 1,
+            weekdays: { shorthand: ['CN','T2','T3','T4','T5','T6','T7'] },
+            months: { shorthand: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'] }
+          },
+          minDate: tomorrow,
+          disable: [],                   // Mặc định không block gì
+          dateFormat: 'Y-m-d',
+          disableMobile: true,
+          onChange(selectedDates) {
+            if (selectedDates.length > 0) {
+              const dateStr = selectedDates[0].toISOString().split('T')[0];
+              document.getElementById('departure_date').value = dateStr;
+              document.getElementById('grp-date').classList.remove('error');
 
-            const info = document.getElementById('selectedInfo');
-            info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
-            info.classList.add('show');
+              const info = document.getElementById('selectedInfo');
+              info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
+              info.classList.add('show');
+            }
           }
-        }
-      });
-
-      // ── Fetch blocked dates từ API để update calendar ──
-      fetch(`/api/schedule?tour_id=${tourId}`)
-        .then(res => res.json())
-        .then(data => {
-          const blockedDates = [
-            ...(data.blocked_all || []),
-            ...(data.blocked_tour || [])
-          ];
-          if (blockedDates.length > 0) {
-            console.log('Updating blocked dates:', blockedDates);
-            calendarInstance.set('disable', blockedDates);
-          }
-        })
-        .catch(err => {
-          console.log('⚠ API blocked dates not available, calendar showing all dates');
         });
+
+        console.log('✓ Flatpickr inline calendar initialized', calendarInstance);
+        // Debug: log calendar element to verify it exists
+        setTimeout(() => {
+          const cal = document.querySelector('.flatpickr-calendar.inline');
+          console.log('Calendar in DOM:', cal, cal ? 'visible: ' + (cal.offsetHeight > 0) : 'NOT FOUND');
+        }, 500);
+
+        // ── Fetch blocked dates từ API để update calendar ──
+        fetch(`/api/schedule?tour_id=${tourId}`)
+          .then(res => res.json())
+          .then(data => {
+            const blockedDates = [
+              ...(data.blocked_all || []),
+              ...(data.blocked_tour || [])
+            ];
+            if (blockedDates.length > 0) {
+              console.log('Updating blocked dates:', blockedDates);
+              calendarInstance.set('disable', blockedDates);
+            }
+          })
+          .catch(err => {
+            console.log('⚠ API blocked dates not available');
+          });
+      } catch (err) {
+        console.error('❌ Lỗi khởi tạo flatpickr:', err);
+      }
     }
   }
 
-  // Khởi tạo date picker khi trang load
-  initDatePicker();
+  // Khởi tạo: cập nhật giá TRƯỚC, sau đó init date picker
+  updatePrice();      // ← Chạy trước để giá luôn đúng
+  initDatePicker();   // ← Chạy sau, nếu lỗi cũng không ảnh hưởng giá
 
   // ===== TÍNH TIỀN =====
   function formatPrice(n) {
