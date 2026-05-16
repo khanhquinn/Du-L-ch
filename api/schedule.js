@@ -5,8 +5,26 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+// Helper: convert PostgreSQL DATE/TIMESTAMP to "YYYY-MM-DD" string
+// pg library returns DATE columns as JavaScript Date objects, not strings
+function toDateStr(d) {
+  if (!d) return '';
+  if (typeof d === 'string') return d.split('T')[0];
+  if (d instanceof Date) {
+    // Use UTC parts to avoid timezone shift
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  return String(d);
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { tour_id } = req.query;
@@ -28,28 +46,36 @@ module.exports = async (req, res) => {
       ORDER BY ts.available_date ASC
     `, [tour_id, today]);
 
-    // Lấy ngày bị khoá toàn bộ (để disable trên calendar)
+    // Lấy ngày bị khoá toàn bộ
     const blocked = await pool.query(`
       SELECT blocked_date FROM blocked_dates
       WHERE blocked_date > $1
       ORDER BY blocked_date
     `, [today]);
 
-    // Lấy ngày tour bị khoá riêng
+    // Lấy ngày tour bị khoá riêng (is_blocked = true cho tour_id này)
     const tourBlocked = await pool.query(`
       SELECT available_date FROM tour_schedules
       WHERE tour_id = $1 AND is_blocked = true AND available_date > $2
     `, [tour_id, today]);
 
-    res.status(200).json({
-      available: schedules.rows,
-      blocked_all: blocked.rows.map(r => r.blocked_date.split('T')[0]),
-      blocked_tour: tourBlocked.rows.map(r => r.available_date.split('T')[0]),
+    // Convert dates SAFELY (handle both Date objects and strings)
+    const result = {
+      available: schedules.rows.map(r => ({
+        ...r,
+        available_date: toDateStr(r.available_date)
+      })),
+      blocked_all: blocked.rows.map(r => toDateStr(r.blocked_date)),
+      blocked_tour: tourBlocked.rows.map(r => toDateStr(r.available_date)),
       has_fixed_schedule: schedules.rows.length > 0
-    });
+    };
+
+    console.log(`[/api/schedule] tour_id=${tour_id} - blocked_all=${result.blocked_all.length}, blocked_tour=${result.blocked_tour.length}`);
+
+    res.status(200).json(result);
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Lỗi server' });
+    console.error('[/api/schedule] ERROR:', err);
+    res.status(500).json({ error: 'Lỗi server', detail: err.message });
   }
 };
