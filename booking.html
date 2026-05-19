@@ -476,53 +476,65 @@
 
     .booking-grid {
       display: grid;
-      grid-template-columns: 1fr 1.6fr;
+      grid-template-columns: 1.2fr 1fr 1.5fr;
       gap: 2rem;
       align-items: start;
     }
 
-    /* ===== TOUR INFO CARD ===== */
-    .tour-info-card {
-      background: var(--dark3);
-      border: 1px solid rgba(201, 168, 76, 0.2);
+    /* ===== TOUR IMAGES COLLAGE ===== */
+    .tour-images-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 4px;
       border-radius: 4px;
       overflow: hidden;
+      aspect-ratio: 1.2 / 1;
       position: sticky;
       top: 100px;
     }
 
-    .tour-info-card img {
+    .tour-images-grid img {
       width: 100%;
-      height: 200px;
+      height: 100%;
       object-fit: cover;
-      filter: brightness(0.85);
+      transition: transform 0.3s;
     }
 
-    .tour-info-body {
-      padding: 1.5rem;
+    .tour-images-grid img:hover {
+      transform: scale(1.03);
     }
 
-    .tour-info-body .tour-badge {
-      position: static;
-      display: inline-block;
-      margin-bottom: 0.8rem;
+    /* ===== TOUR DETAILS PANEL ===== */
+    .tour-details-panel {
+      position: sticky;
+      top: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
 
-    .tour-info-body h3 {
+    .tour-details-panel h1 {
       font-family: var(--font-display);
-      font-size: 1.2rem;
+      font-size: 1.8rem;
       color: var(--white);
-      margin-bottom: 1rem;
-      line-height: 1.4;
+      line-height: 1.3;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .tour-meta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
     }
 
     .tour-detail-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.6rem 0;
+      padding: 0.8rem 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
     .tour-detail-row:last-child {
@@ -539,25 +551,26 @@
     }
 
     .price-highlight {
-      background: rgba(201, 168, 76, 0.1);
-      border: 1px solid rgba(201, 168, 76, 0.3);
+      background: rgba(201, 168, 76, 0.05);
+      border: 1px solid rgba(201, 168, 76, 0.25);
       border-radius: 4px;
-      padding: 1rem;
-      margin-top: 1rem;
+      padding: 1.5rem;
       text-align: center;
+      margin-top: 1rem;
     }
 
     .price-highlight .label {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       color: var(--gray);
+      margin-bottom: 0.4rem;
     }
 
     .price-highlight .amount {
       font-family: var(--font-display);
-      font-size: 1.6rem;
+      font-size: 2.2rem;
       color: var(--gold-light);
       display: block;
-      margin-top: 0.2rem;
+      font-weight: 700;
     }
 
     /* ===== TOUR DESCRIPTION SECTION ===== */
@@ -874,21 +887,29 @@
       }
     }
 
+    @media (max-width: 1024px) {
+      .booking-grid {
+        grid-template-columns: 1.2fr 1fr;
+      }
+      .booking-form-wrap {
+        grid-column: span 2;
+      }
+    }
+
     @media (max-width: 768px) {
       .booking-grid {
         grid-template-columns: 1fr;
       }
-
-      .tour-info-card {
+      .tour-images-grid,
+      .tour-details-panel {
         position: static;
       }
-
+      .booking-form-wrap {
+        grid-column: span 1;
+        padding: 1.5rem;
+      }
       .form-row {
         grid-template-columns: 1fr;
-      }
-
-      .booking-form-wrap {
-        padding: 1.5rem;
       }
     }
   </style>
@@ -925,12 +946,22 @@
       <div id="bookingContent">
         <div class="booking-grid">
 
-          <!-- Tour Info -->
-          <div class="tour-info-card">
-            <img id="tourImg" src="assets/images/anh_chinh.jpg" alt="Tour" />
-            <div class="tour-info-body">
+          <!-- Tour Images Collage (2x2 Grid) -->
+          <div class="tour-images-grid" id="tourImagesGrid">
+            <img id="tourImg1" src="assets/images/anh_chinh.jpg" alt="Tour 1" />
+            <img id="tourImg2" src="assets/images/anh_chinh.jpg" alt="Tour 2" />
+            <img id="tourImg3" src="assets/images/anh_chinh.jpg" alt="Tour 3" />
+            <img id="tourImg4" src="assets/images/anh_chinh.jpg" alt="Tour 4" />
+          </div>
+
+          <!-- Tour Details Panel -->
+          <div class="tour-details-panel">
+            <div>
               <span class="tour-badge" id="tourBadge" style="display:none"></span>
-              <h3 id="tourTitle">Đang tải thông tin tour...</h3>
+            </div>
+            <h1 id="tourTitle">Đang tải thông tin tour...</h1>
+            
+            <div class="tour-meta-list">
               <div class="tour-detail-row">
                 <span>📍 Điểm đến</span>
                 <span id="tourDest">–</span>
@@ -943,10 +974,11 @@
                 <span>👥 Tối đa</span>
                 <span id="tourMax">–</span>
               </div>
-              <div class="price-highlight">
-                <div class="label">Giá người lớn</div>
-                <span class="amount" id="tourPrice">–</span>
-              </div>
+            </div>
+
+            <div class="price-highlight">
+              <div class="label">Giá người lớn</div>
+              <span class="amount" id="tourPrice">–</span>
             </div>
           </div>
 
@@ -1191,7 +1223,8 @@
           },
           {
             heading: 'GIÁ TOUR TRẺ EM :',
-            body: `(tính theo giá người lớn và trẻ em theo code của dự án)`
+            body: `- Trẻ em từ 2-9: Tính 70% giá vé.<br>
+- Trẻ em từ 10 tuổi : Tính 100% giá vé.`
           },
           {
             heading: 'LƯU Ý :',
@@ -1200,12 +1233,8 @@
           }
         ]
       }
-      // Có thể thêm description cho tour khác sau, ví dụ:
-      // 4: { ... description tour Lăng Tẩm ... }
-      // 8: { ... description tour Đầm Phá Tam Giang ... }
-    };
 
-    // Hàm render description theo tour ID
+    };
     function renderTourDescription(tourId) {
       const section = document.getElementById('tourDescriptionSection');
       const desc = TOUR_DESCRIPTIONS[tourId];
@@ -1248,6 +1277,12 @@
         badge: 'Bestseller',
         badgeClass: '',
         img: 'assets/images/langtam.png',
+        images: [
+          'assets/images/langtam.png',
+          'assets/images/dại nội.jpg',
+          'assets/images/chuaHue.png',
+          'assets/images/photo.png'
+        ],
         hasFixedSchedule: true
       },
 
@@ -1259,6 +1294,12 @@
         priceAdult: 850000,
         badge: null,
         img: 'assets/images/amthuc.png',
+        images: [
+          'assets/images/amthuc.png',
+          'assets/images/anh_chinh.jpg',
+          'assets/images/song_huong.jpg',
+          'assets/images/thuyen.jpg'
+        ],
         hasFixedSchedule: false
       },
       4: {
@@ -1270,6 +1311,12 @@
         badge: 'Bestseller',
         badgeClass: '',
         img: 'assets/images/langtamtrieunguyen.jpg',
+        images: [
+          'assets/images/langtamtrieunguyen.jpg',
+          'assets/images/langtam.png',
+          'assets/images/thienmu.jpg',
+          'assets/images/photo.png'
+        ],
         hasFixedSchedule: false
       },
       5: {
@@ -1280,6 +1327,12 @@
         priceAdult: 1650000,
         badge: null,
         img: 'assets/images/langco.jpg',
+        images: [
+          'assets/images/langco.jpg',
+          'assets/images/phatamgiang.png',
+          'assets/images/song_huong.jpg',
+          'assets/images/thuyen.jpg'
+        ],
         hasFixedSchedule: true
       },
       6: {
@@ -1290,6 +1343,12 @@
         priceAdult: 650000,
         badge: null,
         img: 'assets/images/chuaHue.png',
+        images: [
+          'assets/images/chuaHue.png',
+          'assets/images/thienmu.jpg',
+          'assets/images/photo.png',
+          'assets/images/langtam.png'
+        ],
         hasFixedSchedule: false
       },
 
@@ -1302,6 +1361,12 @@
         badge: 'Mới',
         badgeClass: 'new',
         img: 'assets/images/phatamgiang.png',
+        images: [
+          'assets/images/phatamgiang.png',
+          'assets/images/thuyen.jpg',
+          'assets/images/song_huong.jpg',
+          'assets/images/amthuc.png'
+        ],
         hasFixedSchedule: true
       },
 
@@ -1313,6 +1378,12 @@
         priceAdult: 2100000,
         badge: null,
         img: 'assets/images/bachma.png',
+        images: [
+          'assets/images/bachma.png',
+          'assets/images/song_huong.jpg',
+          'assets/images/thuyen.jpg',
+          'assets/images/photo.png'
+        ],
         hasFixedSchedule: false
       },
 
@@ -1324,6 +1395,12 @@
         priceAdult: 490000,
         badge: null,
         img: 'assets/images/tour1day.png',
+        images: [
+          'assets/images/tour1day.png',
+          'assets/images/anh_chinh.jpg',
+          'assets/images/dại nội.jpg',
+          'assets/images/thienmu.jpg'
+        ],
         hasFixedSchedule: false
       },
 
@@ -1335,6 +1412,12 @@
         priceAdult: 380000,
         badge: null,
         img: 'assets/images/langtam.png',
+        images: [
+          'assets/images/caungoi.png',
+          'assets/images/langtam.png',
+          'assets/images/song_huong.jpg',
+          'assets/images/photo.png'
+        ],
         hasFixedSchedule: false
       }
     };
@@ -1345,8 +1428,22 @@
     const tour = TOURS[tourId] || TOURS[1];
 
     // ===== HIỂN THỊ THÔNG TIN TOUR =====
-    document.getElementById('tourImg').src = tour.img;
-    document.getElementById('tourImg').alt = tour.title;
+    if (tour.images && tour.images.length === 4) {
+      document.getElementById('tourImg1').src = tour.images[0];
+      document.getElementById('tourImg2').src = tour.images[1];
+      document.getElementById('tourImg3').src = tour.images[2];
+      document.getElementById('tourImg4').src = tour.images[3];
+    } else {
+      document.getElementById('tourImg1').src = tour.img;
+      document.getElementById('tourImg2').src = tour.img;
+      document.getElementById('tourImg3').src = tour.img;
+      document.getElementById('tourImg4').src = tour.img;
+    }
+    document.getElementById('tourImg1').alt = tour.title;
+    document.getElementById('tourImg2').alt = tour.title;
+    document.getElementById('tourImg3').alt = tour.title;
+    document.getElementById('tourImg4').alt = tour.title;
+
     document.getElementById('tourTitle').textContent = tour.title;
     document.getElementById('tourDest').textContent = tour.destination;
     document.getElementById('tourDuration').textContent = tour.duration;
