@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đặt Tour – Khám Phá Huế</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
   <style>
     /* ===== CUSTOM CALENDAR (tour tự chọn ngày) ===== */
     .inline-calendar-label {
@@ -15,25 +18,28 @@
       margin-bottom: 0.8rem;
       font-weight: 500;
     }
+
     .custom-calendar {
       background: #1a1a1a;
-      border: 1px solid rgba(201,168,76,0.3);
+      border: 1px solid rgba(201, 168, 76, 0.3);
       border-radius: 6px;
       padding: 1rem;
       font-family: 'DM Sans', sans-serif;
       user-select: none;
     }
+
     .cal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1rem;
       padding-bottom: 0.7rem;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
+
     .cal-nav-btn {
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.3);
+      background: rgba(201, 168, 76, 0.1);
+      border: 1px solid rgba(201, 168, 76, 0.3);
       color: #e2c97e;
       width: 32px;
       height: 32px;
@@ -46,25 +52,30 @@
       justify-content: center;
       transition: background 0.2s;
     }
+
     .cal-nav-btn:hover {
-      background: rgba(201,168,76,0.25);
+      background: rgba(201, 168, 76, 0.25);
     }
+
     .cal-nav-btn:disabled {
       opacity: 0.3;
       cursor: not-allowed;
     }
+
     .cal-title {
       color: #e2c97e;
       font-size: 1.05rem;
       font-weight: 500;
       font-family: 'Playfair Display', serif;
     }
+
     .cal-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 4px;
       margin-bottom: 6px;
     }
+
     .cal-weekday {
       text-align: center;
       color: #888;
@@ -74,11 +85,13 @@
       padding: 0.4rem 0;
       font-weight: 500;
     }
+
     .cal-days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 4px;
     }
+
     .cal-day {
       aspect-ratio: 1;
       display: flex;
@@ -92,44 +105,66 @@
       border: 1px solid transparent;
       min-height: 40px;
     }
+
     .cal-day:hover:not(.disabled):not(.empty) {
-      background: rgba(201,168,76,0.15);
-      border-color: rgba(201,168,76,0.3);
+      background: rgba(201, 168, 76, 0.15);
+      border-color: rgba(201, 168, 76, 0.3);
     }
+
     .cal-day.today {
-      border-color: rgba(201,168,76,0.5);
+      border-color: rgba(201, 168, 76, 0.5);
       font-weight: 600;
     }
+
     .cal-day.selected {
       background: #c9a84c !important;
       color: #0a0a0a !important;
       font-weight: 600;
       border-color: #c9a84c !important;
     }
+
     .cal-day.disabled {
       color: #333;
       text-decoration: line-through;
       cursor: not-allowed;
     }
+
     .cal-day.empty {
       cursor: default;
     }
+
     .cal-day.blocked {
       color: #555;
-      background: rgba(220,38,38,0.05);
+      background: rgba(220, 38, 38, 0.05);
       cursor: not-allowed;
       text-decoration: line-through;
     }
+
     @media (max-width: 600px) {
-      .cal-day { font-size: 0.85rem; min-height: 36px; }
-      .cal-title { font-size: 0.95rem; }
+      .cal-day {
+        font-size: 0.85rem;
+        min-height: 36px;
+      }
+
+      .cal-title {
+        font-size: 0.95rem;
+      }
     }
-    
+
     /* Calendar wrapper */
-    .date-picker-wrap { position: relative; margin-bottom: 1rem; }
+    .date-picker-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
     .date-picker-wrap .cal-icon {
-      position: absolute; right: .9rem; top: 50%; transform: translateY(-50%);
-      color: #888; pointer-events: none; font-size: 1rem;
+      position: absolute;
+      right: .9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      pointer-events: none;
+      font-size: 1rem;
     }
   </style>
 
@@ -141,19 +176,22 @@
       color: var(--white);
       margin-bottom: .15rem;
     }
+
     .schedule-subtitle {
       font-size: .78rem;
       color: var(--gray);
       margin-bottom: .8rem;
     }
+
     .month-tabs {
       display: flex;
       gap: 0;
       background: var(--dark2);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 4px 4px 0 0;
       overflow: hidden;
     }
+
     .month-tab {
       flex: 1;
       background: transparent;
@@ -166,70 +204,101 @@
       transition: all .2s;
       letter-spacing: .02em;
     }
-    .month-tab:hover { color: var(--gold-light); background: rgba(201,168,76,0.05); }
+
+    .month-tab:hover {
+      color: var(--gold-light);
+      background: rgba(201, 168, 76, 0.05);
+    }
+
     .month-tab.active {
       background: var(--gold);
       color: var(--dark);
       font-weight: 600;
     }
+
     .schedule-table {
       background: var(--dark2);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-top: none;
       border-radius: 0 0 4px 4px;
       overflow: hidden;
     }
+
     .schedule-header {
       display: grid;
       grid-template-columns: 1.3fr 1.2fr 1.4fr 1fr;
       padding: .65rem 1rem;
-      background: rgba(255,255,255,0.02);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       font-size: .68rem;
       letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--gray);
     }
-    .schedule-header span:last-child { text-align: right; }
+
+    .schedule-header span:last-child {
+      text-align: right;
+    }
+
     .schedule-row {
       display: grid;
       grid-template-columns: 1.3fr 1.2fr 1.4fr 1fr;
       padding: 1rem;
       align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       cursor: pointer;
       transition: background .15s;
     }
-    .schedule-row:last-child { border-bottom: none; }
-    .schedule-row:hover { background: rgba(201,168,76,0.05); }
+
+    .schedule-row:last-child {
+      border-bottom: none;
+    }
+
+    .schedule-row:hover {
+      background: rgba(201, 168, 76, 0.05);
+    }
+
     .schedule-row.selected {
-      background: rgba(201,168,76,0.12);
+      background: rgba(201, 168, 76, 0.12);
       box-shadow: inset 3px 0 0 var(--gold);
     }
-    .row-date  { display: flex; flex-direction: column; gap: .15rem; }
+
+    .row-date {
+      display: flex;
+      flex-direction: column;
+      gap: .15rem;
+    }
+
     .row-date strong {
       color: var(--white);
       font-size: .95rem;
       font-weight: 500;
     }
+
     .row-date small {
       color: #2ecc71;
       font-size: .72rem;
     }
+
     .row-class {
       color: var(--text);
       font-size: .85rem;
     }
+
     .row-price {
       color: var(--gold-light);
       font-family: var(--font-display);
       font-size: 1.1rem;
       font-weight: 700;
     }
-    .row-action { text-align: right; }
+
+    .row-action {
+      text-align: right;
+    }
+
     .row-btn {
-      background: rgba(201,168,76,0.08);
-      border: 1px solid rgba(201,168,76,0.35);
+      background: rgba(201, 168, 76, 0.08);
+      border: 1px solid rgba(201, 168, 76, 0.35);
       color: var(--gold-light);
       padding: .45rem .9rem;
       border-radius: 3px;
@@ -238,60 +307,71 @@
       cursor: pointer;
       transition: all .2s;
     }
+
     .schedule-row:hover .row-btn,
     .schedule-row.selected .row-btn {
       background: var(--gold);
       color: var(--dark);
       border-color: var(--gold);
     }
+
     .schedule-empty {
       padding: 2rem 1rem;
       text-align: center;
       color: var(--gray);
       font-size: .85rem;
     }
+
     .schedule-selected-info {
       margin-top: .6rem;
       font-size: .8rem;
       color: var(--gold-light);
       display: none;
     }
-    .schedule-selected-info.show { display: block; }
+
+    .schedule-selected-info.show {
+      display: block;
+    }
 
     .quantity-section {
       margin-bottom: 1.5rem;
     }
+
     .quantity-row {
       display: grid;
       grid-template-columns: 1.5fr 1.8fr 1fr;
       align-items: center;
       gap: 1.2rem;
       padding: 1rem;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 4px;
       margin-bottom: 0.8rem;
     }
+
     .qty-label {
       font-size: 0.9rem;
       color: var(--white);
       line-height: 1.4;
     }
+
     .qty-label small {
       font-size: 0.75rem;
       color: var(--gray);
       display: block;
       margin-top: 0.2rem;
     }
+
     .qty-control {
       display: flex;
       align-items: center;
       gap: 0;
-      border: 1px solid rgba(201,168,76,0.3);
+      border: 1px solid rgba(201, 168, 76, 0.3);
       border-radius: 3px;
-      background: rgba(255,255,255,0.02);
+      background: rgba(255, 255, 255, 0.02);
       overflow: hidden;
     }
+
     .qty-btn {
       background: transparent;
       border: none;
@@ -307,34 +387,40 @@
       align-items: center;
       justify-content: center;
     }
+
     .qty-btn:hover {
-      background: rgba(201,168,76,0.15);
+      background: rgba(201, 168, 76, 0.15);
     }
+
     .qty-input {
       flex: 1;
       background: transparent;
       border: none;
-      border-left: 1px solid rgba(201,168,76,0.2);
-      border-right: 1px solid rgba(201,168,76,0.2);
+      border-left: 1px solid rgba(201, 168, 76, 0.2);
+      border-right: 1px solid rgba(201, 168, 76, 0.2);
       color: var(--white);
       text-align: center;
       font-size: 0.95rem;
       padding: 0.5rem;
       font-weight: 500;
     }
+
     .qty-input::-webkit-outer-spin-button,
     .qty-input::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+
     .qty-input[type=number] {
       -moz-appearance: textfield;
     }
+
     .qty-price {
       text-align: right;
       font-size: 0.95rem;
       color: var(--gold-light);
     }
+
     .qty-price strong {
       display: block;
       font-family: var(--font-display);
@@ -346,6 +432,7 @@
         grid-template-columns: 1fr;
         gap: 0.8rem;
       }
+
       .qty-price {
         text-align: left;
       }
@@ -397,7 +484,7 @@
     /* ===== TOUR INFO CARD ===== */
     .tour-info-card {
       background: var(--dark3);
-      border: 1px solid rgba(201,168,76,0.2);
+      border: 1px solid rgba(201, 168, 76, 0.2);
       border-radius: 4px;
       overflow: hidden;
       position: sticky;
@@ -434,25 +521,37 @@
       justify-content: space-between;
       align-items: center;
       padding: 0.6rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       font-size: 0.85rem;
     }
 
-    .tour-detail-row:last-child { border-bottom: none; }
+    .tour-detail-row:last-child {
+      border-bottom: none;
+    }
 
-    .tour-detail-row span:first-child { color: var(--gray); }
-    .tour-detail-row span:last-child { color: var(--white); font-weight: 500; }
+    .tour-detail-row span:first-child {
+      color: var(--gray);
+    }
+
+    .tour-detail-row span:last-child {
+      color: var(--white);
+      font-weight: 500;
+    }
 
     .price-highlight {
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.3);
+      background: rgba(201, 168, 76, 0.1);
+      border: 1px solid rgba(201, 168, 76, 0.3);
       border-radius: 4px;
       padding: 1rem;
       margin-top: 1rem;
       text-align: center;
     }
 
-    .price-highlight .label { font-size: 0.75rem; color: var(--gray); }
+    .price-highlight .label {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
     .price-highlight .amount {
       font-family: var(--font-display);
       font-size: 1.6rem;
@@ -466,9 +565,10 @@
       margin-top: 3rem;
       padding: 2.5rem;
       background: var(--dark3);
-      border: 1px solid rgba(201,168,76,0.15);
+      border: 1px solid rgba(201, 168, 76, 0.15);
       border-radius: 6px;
     }
+
     .tour-desc-label {
       font-size: 0.75rem;
       letter-spacing: 0.25em;
@@ -478,6 +578,7 @@
       display: block;
       text-align: center;
     }
+
     .tour-desc-title {
       font-family: var(--font-display);
       font-size: clamp(1.5rem, 3vw, 2rem);
@@ -486,22 +587,26 @@
       margin-bottom: 2.5rem;
       font-weight: 700;
     }
+
     .tour-desc-intro {
       font-size: 0.95rem;
-      color: rgba(232,226,214,0.75);
+      color: rgba(232, 226, 214, 0.75);
       line-height: 1.8;
       text-align: center;
       max-width: 700px;
       margin: 0 auto 2rem;
       font-style: italic;
     }
+
     .desc-section {
       padding: 1.5rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
+
     .desc-section:last-child {
       border-bottom: none;
     }
+
     .desc-section h3 {
       font-family: var(--font-display);
       color: var(--gold-light);
@@ -509,34 +614,43 @@
       margin-bottom: 0.8rem;
       font-weight: 600;
     }
+
     .desc-section p {
-      color: rgba(232,226,214,0.8);
+      color: rgba(232, 226, 214, 0.8);
       line-height: 1.85;
       font-size: 0.95rem;
       margin-bottom: 0.6rem;
     }
+
     .desc-section .desc-highlight {
       color: var(--gold-light);
       font-style: italic;
       padding: 0.6rem 1rem;
-      background: rgba(201,168,76,0.08);
+      background: rgba(201, 168, 76, 0.08);
       border-left: 3px solid var(--gold);
       border-radius: 0 4px 4px 0;
       margin-top: 0.6rem;
     }
+
     .desc-section .desc-highlight strong {
       color: var(--gold);
       font-style: normal;
     }
+
     @media (max-width: 600px) {
-      .tour-description-section { padding: 1.5rem; }
-      .desc-section h3 { font-size: 1.05rem; }
+      .tour-description-section {
+        padding: 1.5rem;
+      }
+
+      .desc-section h3 {
+        font-size: 1.05rem;
+      }
     }
 
     /* ===== FORM ===== */
     .booking-form-wrap {
       background: var(--dark3);
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 4px;
       padding: 2rem;
     }
@@ -547,7 +661,7 @@
       color: var(--gold-light);
       margin-bottom: 1.2rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(201,168,76,0.2);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
     }
 
     .form-group {
@@ -568,7 +682,7 @@
     .form-group textarea {
       width: 100%;
       background: var(--dark2);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--white);
       padding: 0.75rem 1rem;
       border-radius: 2px;
@@ -586,7 +700,7 @@
 
     .form-group input::placeholder,
     .form-group textarea::placeholder {
-      color: rgba(136,136,136,0.6);
+      color: rgba(136, 136, 136, 0.6);
     }
 
     .form-group select option {
@@ -617,12 +731,14 @@
       border-color: #e74c3c;
     }
 
-    .form-group.error .form-error { display: block; }
+    .form-group.error .form-error {
+      display: block;
+    }
 
     /* Tổng tiền preview */
     .price-preview {
       background: var(--dark2);
-      border: 1px solid rgba(201,168,76,0.2);
+      border: 1px solid rgba(201, 168, 76, 0.2);
       border-radius: 4px;
       padding: 1.2rem;
       margin: 1.5rem 0;
@@ -643,7 +759,7 @@
       color: var(--white);
       font-weight: 500;
       padding-top: 0.8rem;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       margin-top: 0.5rem;
     }
 
@@ -668,8 +784,16 @@
       transition: background 0.2s, transform 0.2s;
     }
 
-    .btn-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
-    .btn-submit:disabled { background: var(--gray); cursor: not-allowed; transform: none; }
+    .btn-submit:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-submit:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+    }
 
     /* ===== SUCCESS PAGE ===== */
     .success-page {
@@ -697,15 +821,19 @@
     }
 
     .booking-code {
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.3);
+      background: rgba(201, 168, 76, 0.1);
+      border: 1px solid rgba(201, 168, 76, 0.3);
       border-radius: 4px;
       padding: 1.5rem;
       margin: 2rem auto;
       max-width: 400px;
     }
 
-    .booking-code .label { font-size: 0.75rem; color: var(--gray); }
+    .booking-code .label {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
     .booking-code .code {
       font-family: var(--font-display);
       font-size: 2.5rem;
@@ -732,7 +860,7 @@
       display: inline-block;
       width: 16px;
       height: 16px;
-      border: 2px solid rgba(0,0,0,0.3);
+      border: 2px solid rgba(0, 0, 0, 0.3);
       border-top-color: var(--dark);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
@@ -740,16 +868,32 @@
       vertical-align: middle;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     @media (max-width: 768px) {
-      .booking-grid { grid-template-columns: 1fr; }
-      .tour-info-card { position: static; }
-      .form-row { grid-template-columns: 1fr; }
-      .booking-form-wrap { padding: 1.5rem; }
+      .booking-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tour-info-card {
+        position: static;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-form-wrap {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- ===== NAVBAR ===== -->
@@ -836,7 +980,8 @@
 
               <div class="form-group" id="grp-date">
                 <div class="schedule-title">Bảng giá</div>
-                <div class="schedule-subtitle">(Khởi hành từ Huế) – Chọn ngày khởi hành <span style="color:var(--gold-light)">*</span></div>
+                <div class="schedule-subtitle">(Khởi hành từ Huế) – Chọn ngày khởi hành <span
+                    style="color:var(--gold-light)">*</span></div>
 
                 <!-- FIXED SCHEDULE: Tab tháng + Bảng lịch -->
                 <div id="fixedScheduleSection" style="display:none">
@@ -865,7 +1010,7 @@
                   <div id="customCalendar" class="custom-calendar"></div>
                 </div>
 
-                <input type="hidden" id="departure_date"/>
+                <input type="hidden" id="departure_date" />
                 <div class="schedule-selected-info" id="selectedInfo"></div>
                 <div class="form-error" style="margin-top:.5rem">Vui lòng chọn ngày khởi hành</div>
               </div>
@@ -881,7 +1026,7 @@
                   </div>
                   <div class="qty-control">
                     <button type="button" class="qty-btn qty-minus" onclick="changeQty('adults', -1)">−</button>
-                    <input type="number" id="num_adults" class="qty-input" value="1" min="1" max="20" readonly/>
+                    <input type="number" id="num_adults" class="qty-input" value="1" min="1" max="20" readonly />
                     <button type="button" class="qty-btn qty-plus" onclick="changeQty('adults', 1)">+</button>
                   </div>
                   <div class="qty-price">
@@ -892,11 +1037,11 @@
                 <!-- Trẻ em 2-9 tuổi -->
                 <div class="quantity-row">
                   <div class="qty-label">
-                    <strong>Trẻ em</strong><br/><small>(2-9 tuổi)</small>
+                    <strong>Trẻ em</strong><br /><small>(2-9 tuổi)</small>
                   </div>
                   <div class="qty-control">
                     <button type="button" class="qty-btn qty-minus" onclick="changeQty('children', -1)">−</button>
-                    <input type="number" id="num_children" class="qty-input" value="0" min="0" max="20" readonly/>
+                    <input type="number" id="num_children" class="qty-input" value="0" min="0" max="20" readonly />
                     <button type="button" class="qty-btn qty-plus" onclick="changeQty('children', 1)">+</button>
                   </div>
                   <div class="qty-price">
@@ -907,11 +1052,11 @@
                 <!-- Em bé dưới 2 tuổi -->
                 <div class="quantity-row">
                   <div class="qty-label">
-                    <strong>Em bé</strong><br/><small>(&lt;2 tuổi)</small>
+                    <strong>Em bé</strong><br /><small>(&lt;2 tuổi)</small>
                   </div>
                   <div class="qty-control">
                     <button type="button" class="qty-btn qty-minus" onclick="changeQty('infant', -1)">−</button>
-                    <input type="number" id="num_infant" class="qty-input" value="0" min="0" max="10" readonly/>
+                    <input type="number" id="num_infant" class="qty-input" value="0" min="0" max="10" readonly />
                     <button type="button" class="qty-btn qty-plus" onclick="changeQty('infant', 1)">+</button>
                   </div>
                   <div class="qty-price">
@@ -987,245 +1132,268 @@
   </div>
 
   <script>
-  // ===== DỮ LIỆU TOUR (khớp với database Railway và index.html) =====
-  // ===== GIỚI THIỆU TOUR (Description) =====
-  // Tour nào không có trong đây sẽ ẩn section giới thiệu
-  const TOUR_DESCRIPTIONS = {
-    1: {
-      label: 'Giới Thiệu',
-      title: 'Tour Di Sản UNESCO',
-      intro: 'Khám phá 5 di sản UNESCO của Cố Đô Huế – từ Quần thể di tích đến Nhã nhạc cung đình, Mộc bản, Châu bản và Thơ văn kiến trúc cung đình.',
-      sections: [
-        {
-          heading: '1. Quần thể di tích Cố đô Huế',
-          body: 'Quần thể di tích Cố đô Huế được UNESCO công nhận năm 1993, là di sản văn hóa thế giới đầu tiên của Việt Nam. Đây là trung tâm chính trị, văn hóa quan trọng suốt gần 400 năm (1558–1945). Hệ thống gồm Kinh thành, Hoàng thành và Tử Cấm Thành với kiến trúc hài hòa giữa Đông và Tây, gắn liền với cảnh quan thiên nhiên như sông Hương, núi Ngự Bình.',
-          highlight: 'tham quan Đại Nội, Ngọ Môn, điện Thái Hòa và các công trình cung đình đặc sắc.'
-        },
-        {
-          heading: '2. Nhã nhạc cung đình Huế',
-          body: 'Nhã nhạc là loại hình âm nhạc cung đình được UNESCO công nhận là di sản phi vật thể năm 2003. Đây là âm nhạc phục vụ các nghi lễ hoàng gia, mang giá trị nghệ thuật và tinh thần sâu sắc.',
-          highlight: 'thưởng thức biểu diễn Nhã nhạc truyền thống.'
-        },
-        {
-          heading: '3. Mộc bản triều Nguyễn',
-          body: 'Kho mộc bản gồm hơn 34.000 tấm khắc gỗ chứa các tài liệu lịch sử, văn hóa quan trọng của triều Nguyễn. Được UNESCO công nhận là di sản tư liệu thế giới năm 2009.',
-          highlight: 'tìm hiểu kỹ thuật in khắc cổ và lịch sử Việt Nam.'
-        },
-        {
-          heading: '4. Châu bản triều Nguyễn',
-          body: 'Châu bản là hệ thống văn bản hành chính có bút tích của các hoàng đế, phản ánh toàn diện đời sống xã hội thời Nguyễn. Được UNESCO công nhận năm 2014.',
-          highlight: 'khám phá dấu ấn quản lý và quyền lực triều đình.'
-        },
-        {
-          heading: '5. Thơ văn trên kiến trúc cung đình Huế',
-          body: 'Hệ thống gần 3.000 ô thơ văn được chạm khắc và trang trí trên các công trình cung đình. Đây là di sản độc đáo được UNESCO công nhận năm 2016.',
-          highlight: 'chiêm ngưỡng sự kết hợp giữa văn học và kiến trúc cung đình.'
-        },
-        {
-          heading: '6. Trải nghiệm văn hóa',
-          body: 'Ngoài ra, du khách còn có thể trải nghiệm các giá trị văn hóa như tín ngưỡng thờ Mẫu và nghệ thuật Bài Chòi.',
-          highlight: 'hòa mình vào không gian văn hóa truyền thống Huế.'
-        },
-        {
-          heading: 'Lưu ý khi đi tour',
-          body: '<strong>GIÁ TOUR BAO GỒM :</strong><br><br><strong>Vận chuyển :</strong><br><br>Xe du lịch chất lượng cao<br><strong>Ăn uống :</strong><br><br>1 bữa ăn trưa Picnic<br>Nước uống 2 chai/ người/ ngày + khăn lạnh<br><strong>Hướng dẫn viên :</strong> Thân thiện, nhiệt tình phục vụ suốt tuyến<br><br><strong>Vé tham quan :</strong><br><br>Vé tham quan các điểm 1 lượt sử dụng các điểm có trong chương trình .<br>Mũ bảo hiểm, áo mưa cho từng khách hàng<br><strong>Bảo hiểm :</strong> Mức bồi thường tối đa 20.000.000 đ/ 1 vụ<br><br><strong>GIÁ TOUR KHÔNG BAO GỒM :</strong><br><br>Chi phí cá nhân, bữa ăn sáng<br>Tiền Tips cho Tài xế và HDV<br><strong>GIÁ TOUR TRẺ EM :</strong><br>tính theo giá người lớn và trẻ em theo code của dự án)<br><strong>LƯU Ý :</strong><br><br>Trong những trường hợp khách quan như: khủng bố, thiên tai…hoặc do có sự cố, có sự thay đổi lịch trình của các phương tiện vận chuyển công cộng như : máy bay, tàu hỏa…thì Cty sẽ giữ quyền thay đổi lộ trình bất cứ lúc nào vì sự thuận tiện, an toàn cho khách hàng và sẽ không chịu trách nhiệm bồi thường những thiệt hại phát sinh.<br>Tour thuần túy du lịch, suốt chương trình tour quý khách không được tự ý rời đoàn'
-        }
-      ]
-    }
-    // Có thể thêm description cho tour khác sau, ví dụ:
-    // 4: { ... description tour Lăng Tẩm ... }
-    // 8: { ... description tour Đầm Phá Tam Giang ... }
-  };
+    // ===== DỮ LIỆU TOUR (khớp với database Railway và index.html) =====
+    // ===== GIỚI THIỆU TOUR (Description) =====
+    // Tour nào không có trong đây sẽ ẩn section giới thiệu
+    const TOUR_DESCRIPTIONS = {
+      1: {
+        label: 'Giới Thiệu',
+        title: 'Tour Di Sản UNESCO',
+        intro: 'Khám phá 5 di sản UNESCO của Cố Đô Huế – từ Quần thể di tích đến Nhã nhạc cung đình, Mộc bản, Châu bản và Thơ văn kiến trúc cung đình.',
+        sections: [
+          {
+            heading: '1. Quần thể di tích Cố đô Huế',
+            body: 'Quần thể di tích Cố đô Huế được UNESCO công nhận năm 1993, là di sản văn hóa thế giới đầu tiên của Việt Nam. Đây là trung tâm chính trị, văn hóa quan trọng suốt gần 400 năm (1558–1945). Hệ thống gồm Kinh thành, Hoàng thành và Tử Cấm Thành với kiến trúc hài hòa giữa Đông và Tây, gắn liền với cảnh quan thiên nhiên như sông Hương, núi Ngự Bình.',
+            highlight: 'tham quan Đại Nội, Ngọ Môn, điện Thái Hòa và các công trình cung đình đặc sắc.'
+          },
+          {
+            heading: '2. Nhã nhạc cung đình Huế',
+            body: 'Nhã nhạc là loại hình âm nhạc cung đình được UNESCO công nhận là di sản phi vật thể năm 2003. Đây là âm nhạc phục vụ các nghi lễ hoàng gia, mang giá trị nghệ thuật và tinh thần sâu sắc.',
+            highlight: 'thưởng thức biểu diễn Nhã nhạc truyền thống.'
+          },
+          {
+            heading: '3. Mộc bản triều Nguyễn',
+            body: 'Kho mộc bản gồm hơn 34.000 tấm khắc gỗ chứa các tài liệu lịch sử, văn hóa quan trọng của triều Nguyễn. Được UNESCO công nhận là di sản tư liệu thế giới năm 2009.',
+            highlight: 'tìm hiểu kỹ thuật in khắc cổ và lịch sử Việt Nam.'
+          },
+          {
+            heading: '4. Châu bản triều Nguyễn',
+            body: 'Châu bản là hệ thống văn bản hành chính có bút tích của các hoàng đế, phản ánh toàn diện đời sống xã hội thời Nguyễn. Được UNESCO công nhận năm 2014.',
+            highlight: 'khám phá dấu ấn quản lý và quyền lực triều đình.'
+          },
+          {
+            heading: '5. Thơ văn trên kiến trúc cung đình Huế',
+            body: 'Hệ thống gần 3.000 ô thơ văn được chạm khắc và trang trí trên các công trình cung đình. Đây là di sản độc đáo được UNESCO công nhận năm 2016.',
+            highlight: 'chiêm ngưỡng sự kết hợp giữa văn học và kiến trúc cung đình.'
+          },
+          {
+            heading: '6. Trải nghiệm văn hóa',
+            body: 'Ngoài ra, du khách còn có thể trải nghiệm các giá trị văn hóa như tín ngưỡng thờ Mẫu và nghệ thuật Bài Chòi.',
+            highlight: 'hòa mình vào không gian văn hóa truyền thống Huế.'
+          },
+          {
+            heading: 'GIÁ TOUR BAO GỒM :',
+            body: `<strong>Vận chuyển :</strong><br>
+- Xe du lịch chất lượng cao<br><br>
+<strong>Ăn uống :</strong><br>
+- 1 bữa ăn trưa Picnic<br>
+- Nước uống 2 chai/ người/ ngày + khăn lạnh<br><br>
+<strong>Hướng dẫn viên :</strong> Thân thiện, nhiệt tình phục vụ suốt tuyến<br><br>
+<strong>Vé tham quan :</strong><br>
+- Vé tham quan các điểm 1 lượt sử dụng các điểm có trong chương trình .<br>
+- Mũ bảo hiểm, áo mưa cho từng khách hàng<br><br>
+<strong>Bảo hiểm :</strong> Mức bồi thường tối đa 20.000.000 đ/ 1 vụ`
+          },
+          {
+            heading: 'GIÁ TOUR KHÔNG BAO GỒM :',
+            body: `- Chi phí cá nhân, bữa ăn sáng<br>
+- Tiền Tips cho Tài xế và HDV`
+          },
+          {
+            heading: 'GIÁ TOUR TRẺ EM :',
+            body: `(tính theo giá người lớn và trẻ em theo code của dự án)`
+          },
+          {
+            heading: 'LƯU Ý :',
+            body: `- Trong những trường hợp khách quan như: khủng bố, thiên tai…hoặc do có sự cố, có sự thay đổi lịch trình của các phương tiện vận chuyển công cộng như : máy bay, tàu hỏa…thì Cty sẽ giữ quyền thay đổi lộ trình bất cứ lúc nào vì sự thuận tiện, an toàn cho khách hàng và sẽ không chịu trách nhiệm bồi thường những thiệt hại phát sinh.<br>
+- Tour thuần túy du lịch, suốt chương trình tour quý khách không được tự ý rời đoàn`
+          }
+        ]
+      }
+      // Có thể thêm description cho tour khác sau, ví dụ:
+      // 4: { ... description tour Lăng Tẩm ... }
+      // 8: { ... description tour Đầm Phá Tam Giang ... }
+    };
 
-  // Hàm render description theo tour ID
-  function renderTourDescription(tourId) {
-    const section = document.getElementById('tourDescriptionSection');
-    const desc = TOUR_DESCRIPTIONS[tourId];
-    
-    if (!desc) {
-      section.style.display = 'none';
-      return;
-    }
+    // Hàm render description theo tour ID
+    function renderTourDescription(tourId) {
+      const section = document.getElementById('tourDescriptionSection');
+      const desc = TOUR_DESCRIPTIONS[tourId];
 
-    let html = `
+      if (!desc) {
+        section.style.display = 'none';
+        return;
+      }
+
+      let html = `
       <span class="tour-desc-label">${desc.label || 'Giới Thiệu'}</span>
       <h2 class="tour-desc-title">${desc.title}</h2>
     `;
-    
-    if (desc.intro) {
-      html += `<p class="tour-desc-intro">${desc.intro}</p>`;
-    }
-    
-    desc.sections.forEach(s => {
-      html += `
+
+      if (desc.intro) {
+        html += `<p class="tour-desc-intro">${desc.intro}</p>`;
+      }
+
+      desc.sections.forEach(s => {
+        html += `
         <div class="desc-section">
           <h3>${s.heading}</h3>
           <p>${s.body}</p>
           ${s.highlight ? `<p class="desc-highlight">📍 <strong>Điểm nhấn:</strong> ${s.highlight}</p>` : ''}
         </div>
       `;
-    });
-    
-    section.innerHTML = html;
-    section.style.display = 'block';
-  }
+      });
 
-  const TOURS = {
-    1: {
-      title: 'Cố Đô Huế Trọn Gói – Di Sản UNESCO',
-      destination: 'Đại Nội – Hoàng Thành',
-      duration: '3 ngày 2 đêm',
-      maxPeople: 20,
-      priceAdult: 2200000,
-      badge: 'Bestseller',
-      badgeClass: '',
-      img: 'assets/images/langtam.png',
-      hasFixedSchedule: true
-    },
-
-    3: {
-      title: 'Khám Phá Ẩm Thực Huế',
-      destination: 'Phố Cổ – Chợ Đông Ba',
-      duration: '1 ngày 1 đêm',
-      maxPeople: 12,
-      priceAdult: 850000,
-      badge: null,
-      img: 'assets/images/amthuc.png',
-      hasFixedSchedule: false
-    },
-    4: {
-      title: 'Hành Trình Lăng Tẩm Triều Nguyễn',
-      destination: 'Lăng Tẩm – Ngoại Thành Huế',
-      duration: '2 ngày 1 đêm',
-      maxPeople: 18,
-      priceAdult: 1800000,
-      badge: 'Bestseller',
-      badgeClass: '',
-      img: 'assets/images/langtamtrieunguyen.jpg',
-      hasFixedSchedule: false
-    },
-    5: {
-      title: 'Lăng Cô – Đèo Hải Vân – Rừng Ngập Mặn Rú Chá',
-      destination: 'Đèo Hải Vân – Lăng Cô – Rú Chá',
-      duration: '2 ngày 1 đêm',
-      maxPeople: 20,
-      priceAdult: 1650000,
-      badge: null,
-      img: 'assets/images/langco.jpg',
-      hasFixedSchedule: true
-    },
-    6: {
-      title: 'Hành Hương Chùa Huế – Tâm Linh Cố Đô',
-      destination: 'Các Chùa Nổi Tiếng Huế',
-      duration: '1 ngày',
-      maxPeople: 25,
-      priceAdult: 650000,
-      badge: null,
-      img: 'assets/images/chuaHue.png',
-      hasFixedSchedule: false
-    },
-
-    8: {
-      title: 'Đầm Phá Tam Giang – Thiên Đường Hải Sản',
-      destination: 'Đầm Phá Tam Giang – Cầu Hai',
-      duration: '2 ngày 1 đêm',
-      maxPeople: 12,
-      priceAdult: 1900000,
-      badge: 'Mới',
-      badgeClass: 'new',
-      img: 'assets/images/phatamgiang.png',
-      hasFixedSchedule: true
-    },
-
-    9: {
-      title: 'Vườn Quốc Gia Bạch Mã – Trekking Rừng Nguyên Sinh',
-      destination: 'Vườn Quốc Gia Bạch Mã',
-      duration: '2 ngày 1 đêm',
-      maxPeople: 10,
-      priceAdult: 2100000,
-      badge: null,
-      img: 'assets/images/bachma.png',
-      hasFixedSchedule: false
-    },
-
-    11: {
-      title: 'Huế 1 Ngày – Tour Ghép Tiết Kiệm',
-      destination: 'Huế – Tổng Hợp',
-      duration: '1 ngày',
-      maxPeople: 30,
-      priceAdult: 490000,
-      badge: null,
-      img: 'assets/images/tour1day.png',
-      hasFixedSchedule: false
-    },
-
-    12: {
-      title: 'Đạp Xe Xuyên Làng Huế – Mekong Style',
-      destination: 'Các Làng Xung Quanh Huế',
-      duration: '1 ngày',
-      maxPeople: 12,
-      priceAdult: 380000,
-      badge: null,
-      img: 'assets/images/langtam.png',
-      hasFixedSchedule: false
-    }
-  };
-
-  // ===== LẤY TOUR ID TỪ URL =====
-  const params  = new URLSearchParams(window.location.search);
-  const tourId  = parseInt(params.get('tour')) || 1;
-  const tour    = TOURS[tourId] || TOURS[1];
-
-  // ===== HIỂN THỊ THÔNG TIN TOUR =====
-  document.getElementById('tourImg').src       = tour.img;
-  document.getElementById('tourImg').alt       = tour.title;
-  document.getElementById('tourTitle').textContent  = tour.title;
-  document.getElementById('tourDest').textContent   = tour.destination;
-  document.getElementById('tourDuration').textContent = tour.duration;
-  document.getElementById('tourMax').textContent    = tour.maxPeople + ' người';
-  document.getElementById('tourPrice').textContent  = formatPrice(tour.priceAdult);
-  document.title = tour.title + ' – Đặt Tour Huế';
-
-  if (tour.badge) {
-    const badge = document.getElementById('tourBadge');
-    badge.textContent = tour.badge;
-    badge.style.display = 'inline-block';
-    if (tour.badgeClass === 'new') badge.classList.add('new');
-    if (tour.badgeClass === 'sale') badge.style.cssText += ';background:#e74c3c;color:#fff';
-  }
-
-  // ===== LỊCH KHỞI HÀNH CỐ ĐỊNH =====
-  const SCHEDULE = [
-    { date: '2026-05-26', month: 5 },
-    { date: '2026-06-09', month: 6 },
-    { date: '2026-06-21', month: 6 },
-    { date: '2026-06-25', month: 6 },
-    { date: '2026-06-28', month: 6 },
-    { date: '2026-07-07', month: 7 },
-    { date: '2026-07-11', month: 7 },
-    { date: '2026-07-14', month: 7 },
-    { date: '2026-07-21', month: 7 },
-    { date: '2026-07-25', month: 7 },
-    { date: '2026-08-12', month: 8 },
-    { date: '2026-08-23', month: 8 },
-    { date: '2026-08-31', month: 8 }
-  ];
-
-  function formatDateVN(isoDate) {
-    const [y, m, d] = isoDate.split('-');
-    return `${d}/${m}/${y}`;
-  }
-
-  function renderSchedule(filterMonth) {
-    const list = document.getElementById('scheduleList');
-    const rows = SCHEDULE.filter(s => filterMonth === 'all' || s.month === Number(filterMonth));
-
-    if (rows.length === 0) {
-      list.innerHTML = '<div class="schedule-empty">Không có lịch khởi hành trong tháng này</div>';
-      return;
+      section.innerHTML = html;
+      section.style.display = 'block';
     }
 
-    list.innerHTML = rows.map(s => `
+    const TOURS = {
+      1: {
+        title: 'Cố Đô Huế Trọn Gói – Di Sản UNESCO',
+        destination: 'Đại Nội – Hoàng Thành',
+        duration: '3 ngày 2 đêm',
+        maxPeople: 20,
+        priceAdult: 2200000,
+        badge: 'Bestseller',
+        badgeClass: '',
+        img: 'assets/images/langtam.png',
+        hasFixedSchedule: true
+      },
+
+      3: {
+        title: 'Khám Phá Ẩm Thực Huế',
+        destination: 'Phố Cổ – Chợ Đông Ba',
+        duration: '1 ngày 1 đêm',
+        maxPeople: 12,
+        priceAdult: 850000,
+        badge: null,
+        img: 'assets/images/amthuc.png',
+        hasFixedSchedule: false
+      },
+      4: {
+        title: 'Hành Trình Lăng Tẩm Triều Nguyễn',
+        destination: 'Lăng Tẩm – Ngoại Thành Huế',
+        duration: '2 ngày 1 đêm',
+        maxPeople: 18,
+        priceAdult: 1800000,
+        badge: 'Bestseller',
+        badgeClass: '',
+        img: 'assets/images/langtamtrieunguyen.jpg',
+        hasFixedSchedule: false
+      },
+      5: {
+        title: 'Lăng Cô – Đèo Hải Vân – Rừng Ngập Mặn Rú Chá',
+        destination: 'Đèo Hải Vân – Lăng Cô – Rú Chá',
+        duration: '2 ngày 1 đêm',
+        maxPeople: 20,
+        priceAdult: 1650000,
+        badge: null,
+        img: 'assets/images/langco.jpg',
+        hasFixedSchedule: true
+      },
+      6: {
+        title: 'Hành Hương Chùa Huế – Tâm Linh Cố Đô',
+        destination: 'Các Chùa Nổi Tiếng Huế',
+        duration: '1 ngày',
+        maxPeople: 25,
+        priceAdult: 650000,
+        badge: null,
+        img: 'assets/images/chuaHue.png',
+        hasFixedSchedule: false
+      },
+
+      8: {
+        title: 'Đầm Phá Tam Giang – Thiên Đường Hải Sản',
+        destination: 'Đầm Phá Tam Giang – Cầu Hai',
+        duration: '2 ngày 1 đêm',
+        maxPeople: 12,
+        priceAdult: 1900000,
+        badge: 'Mới',
+        badgeClass: 'new',
+        img: 'assets/images/phatamgiang.png',
+        hasFixedSchedule: true
+      },
+
+      9: {
+        title: 'Vườn Quốc Gia Bạch Mã – Trekking Rừng Nguyên Sinh',
+        destination: 'Vườn Quốc Gia Bạch Mã',
+        duration: '2 ngày 1 đêm',
+        maxPeople: 10,
+        priceAdult: 2100000,
+        badge: null,
+        img: 'assets/images/bachma.png',
+        hasFixedSchedule: false
+      },
+
+      11: {
+        title: 'Huế 1 Ngày – Tour Ghép Tiết Kiệm',
+        destination: 'Huế – Tổng Hợp',
+        duration: '1 ngày',
+        maxPeople: 30,
+        priceAdult: 490000,
+        badge: null,
+        img: 'assets/images/tour1day.png',
+        hasFixedSchedule: false
+      },
+
+      12: {
+        title: 'Đạp Xe Xuyên Làng Huế – Mekong Style',
+        destination: 'Các Làng Xung Quanh Huế',
+        duration: '1 ngày',
+        maxPeople: 12,
+        priceAdult: 380000,
+        badge: null,
+        img: 'assets/images/langtam.png',
+        hasFixedSchedule: false
+      }
+    };
+
+    // ===== LẤY TOUR ID TỪ URL =====
+    const params = new URLSearchParams(window.location.search);
+    const tourId = parseInt(params.get('tour')) || 1;
+    const tour = TOURS[tourId] || TOURS[1];
+
+    // ===== HIỂN THỊ THÔNG TIN TOUR =====
+    document.getElementById('tourImg').src = tour.img;
+    document.getElementById('tourImg').alt = tour.title;
+    document.getElementById('tourTitle').textContent = tour.title;
+    document.getElementById('tourDest').textContent = tour.destination;
+    document.getElementById('tourDuration').textContent = tour.duration;
+    document.getElementById('tourMax').textContent = tour.maxPeople + ' người';
+    document.getElementById('tourPrice').textContent = formatPrice(tour.priceAdult);
+    document.title = tour.title + ' – Đặt Tour Huế';
+
+    if (tour.badge) {
+      const badge = document.getElementById('tourBadge');
+      badge.textContent = tour.badge;
+      badge.style.display = 'inline-block';
+      if (tour.badgeClass === 'new') badge.classList.add('new');
+      if (tour.badgeClass === 'sale') badge.style.cssText += ';background:#e74c3c;color:#fff';
+    }
+
+    // ===== LỊCH KHỞI HÀNH CỐ ĐỊNH =====
+    const SCHEDULE = [
+      { date: '2026-05-26', month: 5 },
+      { date: '2026-06-09', month: 6 },
+      { date: '2026-06-21', month: 6 },
+      { date: '2026-06-25', month: 6 },
+      { date: '2026-06-28', month: 6 },
+      { date: '2026-07-07', month: 7 },
+      { date: '2026-07-11', month: 7 },
+      { date: '2026-07-14', month: 7 },
+      { date: '2026-07-21', month: 7 },
+      { date: '2026-07-25', month: 7 },
+      { date: '2026-08-12', month: 8 },
+      { date: '2026-08-23', month: 8 },
+      { date: '2026-08-31', month: 8 }
+    ];
+
+    function formatDateVN(isoDate) {
+      const [y, m, d] = isoDate.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function renderSchedule(filterMonth) {
+      const list = document.getElementById('scheduleList');
+      const rows = SCHEDULE.filter(s => filterMonth === 'all' || s.month === Number(filterMonth));
+
+      if (rows.length === 0) {
+        list.innerHTML = '<div class="schedule-empty">Không có lịch khởi hành trong tháng này</div>';
+        return;
+      }
+
+      list.innerHTML = rows.map(s => `
       <div class="schedule-row" data-date="${s.date}" onclick="selectDate('${s.date}', this)">
         <div class="row-date">
           <strong>${formatDateVN(s.date)}</strong>
@@ -1239,106 +1407,106 @@
       </div>
     `).join('');
 
-    // Giữ highlight nếu đã chọn trước đó
-    const selected = document.getElementById('departure_date').value;
-    if (selected) {
-      const row = list.querySelector(`.schedule-row[data-date="${selected}"]`);
-      if (row) row.classList.add('selected');
+      // Giữ highlight nếu đã chọn trước đó
+      const selected = document.getElementById('departure_date').value;
+      if (selected) {
+        const row = list.querySelector(`.schedule-row[data-date="${selected}"]`);
+        if (row) row.classList.add('selected');
+      }
     }
-  }
 
-  function selectDate(dateStr, el) {
-    document.querySelectorAll('.schedule-row.selected').forEach(r => r.classList.remove('selected'));
-    el.classList.add('selected');
-    document.getElementById('departure_date').value = dateStr;
-    document.getElementById('grp-date').classList.remove('error');
+    function selectDate(dateStr, el) {
+      document.querySelectorAll('.schedule-row.selected').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('departure_date').value = dateStr;
+      document.getElementById('grp-date').classList.remove('error');
 
-    const info = document.getElementById('selectedInfo');
-    info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
-    info.classList.add('show');
-  }
+      const info = document.getElementById('selectedInfo');
+      info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
+      info.classList.add('show');
+    }
 
-  // ===== INIT DATE PICKER (Fixed vs Flexible) =====
-  function initDatePicker() {
-    const isFixedSchedule = tour.hasFixedSchedule === true;
-    const fixedSection = document.getElementById('fixedScheduleSection');
-    const flexibleSection = document.getElementById('flexibleScheduleSection');
+    // ===== INIT DATE PICKER (Fixed vs Flexible) =====
+    function initDatePicker() {
+      const isFixedSchedule = tour.hasFixedSchedule === true;
+      const fixedSection = document.getElementById('fixedScheduleSection');
+      const flexibleSection = document.getElementById('flexibleScheduleSection');
 
-    if (isFixedSchedule) {
-      // ──── FIXED SCHEDULE: Show month tabs ────
-      fixedSection.style.display = 'block';
-      flexibleSection.style.display = 'none';
+      if (isFixedSchedule) {
+        // ──── FIXED SCHEDULE: Show month tabs ────
+        fixedSection.style.display = 'block';
+        flexibleSection.style.display = 'none';
 
-      // Tab tháng
-      document.querySelectorAll('.month-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderSchedule(btn.dataset.month);
-        });
-      });
-
-      renderSchedule('all');
-
-    } else {
-      // ──── FLEXIBLE SCHEDULE: Custom Calendar ────
-      fixedSection.style.display = 'none';
-      flexibleSection.style.display = 'block';
-
-      // ── Fetch blocked dates from API (optional) ──
-      let blockedDates = [];
-      
-      fetch(`/api/schedule?tour_id=${tourId}`)
-        .then(res => res.json())
-        .then(data => {
-          blockedDates = [
-            ...(data.blocked_all || []),
-            ...(data.blocked_tour || [])
-          ];
-          console.log('Blocked dates:', blockedDates);
-          renderCustomCalendar();  // Re-render với blocked dates
-        })
-        .catch(err => {
-          console.log('⚠ API không có, calendar không block ngày nào');
-          renderCustomCalendar();
+        // Tab tháng
+        document.querySelectorAll('.month-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderSchedule(btn.dataset.month);
+          });
         });
 
-      // Initial render (trước khi fetch xong)
-      renderCustomCalendar();
+        renderSchedule('all');
 
-      function renderCustomCalendar() {
-        const calendar = document.getElementById('customCalendar');
-        if (!calendar) return;
+      } else {
+        // ──── FLEXIBLE SCHEDULE: Custom Calendar ────
+        fixedSection.style.display = 'none';
+        flexibleSection.style.display = 'block';
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        // ── Fetch blocked dates from API (optional) ──
+        let blockedDates = [];
 
-        // State: current displayed month + selected date
-        if (!window._calState) {
-          window._calState = {
-            year: today.getFullYear(),
-            month: today.getMonth(),
-            selected: null
-          };
-        }
+        fetch(`/api/schedule?tour_id=${tourId}`)
+          .then(res => res.json())
+          .then(data => {
+            blockedDates = [
+              ...(data.blocked_all || []),
+              ...(data.blocked_tour || [])
+            ];
+            console.log('Blocked dates:', blockedDates);
+            renderCustomCalendar();  // Re-render với blocked dates
+          })
+          .catch(err => {
+            console.log('⚠ API không có, calendar không block ngày nào');
+            renderCustomCalendar();
+          });
 
-        const state = window._calState;
-        const monthNames = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
-                            'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+        // Initial render (trước khi fetch xong)
+        renderCustomCalendar();
 
-        // Render
-        function draw() {
-          const firstDay = new Date(state.year, state.month, 1);
-          const lastDay = new Date(state.year, state.month + 1, 0);
-          const startDayOfWeek = (firstDay.getDay() + 6) % 7;  // Monday = 0
-          const daysInMonth = lastDay.getDate();
+        function renderCustomCalendar() {
+          const calendar = document.getElementById('customCalendar');
+          if (!calendar) return;
 
-          // Disable prev nav if showing current month
-          const canGoPrev = !(state.year === today.getFullYear() && state.month === today.getMonth());
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
 
-          let html = `
+          // State: current displayed month + selected date
+          if (!window._calState) {
+            window._calState = {
+              year: today.getFullYear(),
+              month: today.getMonth(),
+              selected: null
+            };
+          }
+
+          const state = window._calState;
+          const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+
+          // Render
+          function draw() {
+            const firstDay = new Date(state.year, state.month, 1);
+            const lastDay = new Date(state.year, state.month + 1, 0);
+            const startDayOfWeek = (firstDay.getDay() + 6) % 7;  // Monday = 0
+            const daysInMonth = lastDay.getDate();
+
+            // Disable prev nav if showing current month
+            const canGoPrev = !(state.year === today.getFullYear() && state.month === today.getMonth());
+
+            let html = `
             <div class="cal-header">
               <button class="cal-nav-btn" id="calPrev" ${!canGoPrev ? 'disabled' : ''}>‹</button>
               <div class="cal-title">${monthNames[state.month]} ${state.year}</div>
@@ -1356,229 +1524,230 @@
             <div class="cal-days">
           `;
 
-          // Empty cells before first day
-          for (let i = 0; i < startDayOfWeek; i++) {
-            html += '<div class="cal-day empty"></div>';
-          }
-
-          // Days of month
-          for (let day = 1; day <= daysInMonth; day++) {
-            const dateObj = new Date(state.year, state.month, day);
-            const dateStr = dateObj.getFullYear() + '-' +
-                           String(state.month + 1).padStart(2, '0') + '-' +
-                           String(day).padStart(2, '0');
-
-            let classes = 'cal-day';
-            let isClickable = true;
-
-            // Past or today → disabled
-            if (dateObj < tomorrow) {
-              classes += ' disabled';
-              isClickable = false;
-            }
-            // Blocked by admin → blocked
-            else if (blockedDates.includes(dateStr)) {
-              classes += ' blocked';
-              isClickable = false;
-            }
-            // Today highlight
-            if (dateObj.getTime() === today.getTime()) {
-              classes += ' today';
-            }
-            // Selected highlight
-            if (state.selected === dateStr) {
-              classes += ' selected';
+            // Empty cells before first day
+            for (let i = 0; i < startDayOfWeek; i++) {
+              html += '<div class="cal-day empty"></div>';
             }
 
-            html += `<div class="${classes}" ${isClickable ? `data-date="${dateStr}"` : ''}>${day}</div>`;
-          }
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+              const dateObj = new Date(state.year, state.month, day);
+              const dateStr = dateObj.getFullYear() + '-' +
+                String(state.month + 1).padStart(2, '0') + '-' +
+                String(day).padStart(2, '0');
 
-          html += '</div>';
-          calendar.innerHTML = html;
+              let classes = 'cal-day';
+              let isClickable = true;
 
-          // Bind events
-          document.getElementById('calPrev').addEventListener('click', () => {
-            if (state.month === 0) {
-              state.month = 11;
-              state.year--;
-            } else {
-              state.month--;
+              // Past or today → disabled
+              if (dateObj < tomorrow) {
+                classes += ' disabled';
+                isClickable = false;
+              }
+              // Blocked by admin → blocked
+              else if (blockedDates.includes(dateStr)) {
+                classes += ' blocked';
+                isClickable = false;
+              }
+              // Today highlight
+              if (dateObj.getTime() === today.getTime()) {
+                classes += ' today';
+              }
+              // Selected highlight
+              if (state.selected === dateStr) {
+                classes += ' selected';
+              }
+
+              html += `<div class="${classes}" ${isClickable ? `data-date="${dateStr}"` : ''}>${day}</div>`;
             }
-            draw();
-          });
 
-          document.getElementById('calNext').addEventListener('click', () => {
-            if (state.month === 11) {
-              state.month = 0;
-              state.year++;
-            } else {
-              state.month++;
-            }
-            draw();
-          });
+            html += '</div>';
+            calendar.innerHTML = html;
 
-          calendar.querySelectorAll('.cal-day[data-date]').forEach(el => {
-            el.addEventListener('click', () => {
-              const dateStr = el.dataset.date;
-              state.selected = dateStr;
-              document.getElementById('departure_date').value = dateStr;
-              document.getElementById('grp-date').classList.remove('error');
-
-              const info = document.getElementById('selectedInfo');
-              info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
-              info.classList.add('show');
-
+            // Bind events
+            document.getElementById('calPrev').addEventListener('click', () => {
+              if (state.month === 0) {
+                state.month = 11;
+                state.year--;
+              } else {
+                state.month--;
+              }
               draw();
             });
-          });
+
+            document.getElementById('calNext').addEventListener('click', () => {
+              if (state.month === 11) {
+                state.month = 0;
+                state.year++;
+              } else {
+                state.month++;
+              }
+              draw();
+            });
+
+            calendar.querySelectorAll('.cal-day[data-date]').forEach(el => {
+              el.addEventListener('click', () => {
+                const dateStr = el.dataset.date;
+                state.selected = dateStr;
+                document.getElementById('departure_date').value = dateStr;
+                document.getElementById('grp-date').classList.remove('error');
+
+                const info = document.getElementById('selectedInfo');
+                info.textContent = '✓ Đã chọn ngày khởi hành: ' + formatDateVN(dateStr);
+                info.classList.add('show');
+
+                draw();
+              });
+            });
+          }
+
+          draw();
+        }
+      }
+    }
+
+    // Khởi tạo: cập nhật giá TRƯỚC, sau đó init date picker
+    updatePrice();      // ← Chạy trước để giá luôn đúng
+    initDatePicker();   // ← Chạy sau, nếu lỗi cũng không ảnh hưởng giá
+    renderTourDescription(tourId);  // ← Hiển thị phần giới thiệu tour (nếu có)
+
+    // ===== TÍNH TIỀN =====
+    function formatPrice(n) {
+      return n.toLocaleString('vi-VN') + 'đ';
+    }
+
+    // ===== QUẢN LÝ LƯỢNG KHÁCH =====
+    function changeQty(type, delta) {
+      const input = type === 'adults' ? document.getElementById('num_adults') :
+        type === 'children' ? document.getElementById('num_children') :
+          document.getElementById('num_infant');
+      const current = parseInt(input.value) || 0;
+      const newVal = Math.max(0, current + delta);
+      input.value = newVal;
+      updatePrice();
+    }
+
+    function updatePrice() {
+      const adults = parseInt(document.getElementById('num_adults').value) || 1;
+      const children = parseInt(document.getElementById('num_children').value) || 0;  // 2-9 tuổi = 80%
+      const infants = parseInt(document.getElementById('num_infant').value) || 0;    // <2 tuổi = miễn phí
+
+      // Tính giá: Adults 100%, Children 2-9 = 80%, Infants = 0%
+      const priceChildren = Math.round(tour.priceAdult * 0.8);
+
+      const adultTotal = tour.priceAdult * adults;
+      const childTotal = priceChildren * children;
+      const infantTotal = 0; // Em bé miễn phí
+      const grand = adultTotal + childTotal + infantTotal;
+
+      // Cập nhật giá từng loại ở bên phải
+      document.getElementById('adultPrice').textContent = formatPrice(tour.priceAdult);
+
+      if (children > 0) {
+        document.getElementById('childPrice').textContent = formatPrice(priceChildren);
+      } else {
+        document.getElementById('childPrice').textContent = '–';
+      }
+
+      // Cập nhật tóm tắt giá
+      document.getElementById('adultLabel').textContent = adults + ' người lớn';
+      document.getElementById('adultTotal').textContent = formatPrice(adultTotal);
+
+      const childRow = document.getElementById('childRow');
+      if (children > 0) {
+        childRow.style.display = 'flex';
+        document.getElementById('childLabel').textContent = children + ' trẻ em (80%)';
+        document.getElementById('childTotal').textContent = formatPrice(childTotal);
+      } else {
+        childRow.style.display = 'none';
+      }
+
+      document.getElementById('grandTotal').textContent = formatPrice(grand);
+    }
+
+    document.getElementById('num_adults').addEventListener('change', updatePrice);
+    document.getElementById('num_children').addEventListener('change', updatePrice);
+    document.getElementById('num_infant').addEventListener('change', updatePrice);
+    updatePrice();
+
+    // ===== VALIDATE =====
+    function validate() {
+      let ok = true;
+
+      const name = document.getElementById('full_name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const date = document.getElementById('departure_date').value;
+
+      // Tên
+      const grpName = document.getElementById('grp-name');
+      if (!name) { grpName.classList.add('error'); ok = false; }
+      else grpName.classList.remove('error');
+
+      // SĐT (10 số)
+      const grpPhone = document.getElementById('grp-phone');
+      if (!/^[0-9]{10}$/.test(phone.replace(/\s/g, ''))) {
+        grpPhone.classList.add('error'); ok = false;
+      } else grpPhone.classList.remove('error');
+
+      // Ngày
+      const grpDate = document.getElementById('grp-date');
+      if (!date || new Date(date) <= new Date()) {
+        grpDate.classList.add('error'); ok = false;
+      } else grpDate.classList.remove('error');
+
+      return ok;
+    }
+
+    // ===== SUBMIT FORM =====
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Đang xử lý...';
+
+      const data = {
+        full_name: document.getElementById('full_name').value.trim(),
+        phone: document.getElementById('phone').value.trim().replace(/\s/g, ''),
+        email: document.getElementById('email').value.trim(),
+        tour_id: tourId,
+        departure_date: document.getElementById('departure_date').value,
+        num_adults: parseInt(document.getElementById('num_adults').value),
+        num_children: parseInt(document.getElementById('num_children').value),
+        num_infant: parseInt(document.getElementById('num_infant').value) || 0,
+        note: document.getElementById('note').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.booking_id) {
+          // Hiện trang thành công
+          document.getElementById('bookingContent').style.display = 'none';
+          const successPage = document.getElementById('successPage');
+          successPage.style.display = 'block';
+          document.getElementById('bookingCode').textContent = '#' + String(result.booking_id).padStart(4, '0');
+          document.getElementById('bookingTotal').textContent = formatPrice(result.total_price);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          throw new Error(result.error || 'Lỗi không xác định');
         }
 
-        draw();
+      } catch (err) {
+        alert('❌ Đặt tour thất bại: ' + err.message + '\nVui lòng thử lại hoặc liên hệ hotline 0234 567 890');
+        btn.disabled = false;
+        btn.innerHTML = 'Xác Nhận Đặt Tour';
       }
-    }
-  }
-
-  // Khởi tạo: cập nhật giá TRƯỚC, sau đó init date picker
-  updatePrice();      // ← Chạy trước để giá luôn đúng
-  initDatePicker();   // ← Chạy sau, nếu lỗi cũng không ảnh hưởng giá
-  renderTourDescription(tourId);  // ← Hiển thị phần giới thiệu tour (nếu có)
-
-  // ===== TÍNH TIỀN =====
-  function formatPrice(n) {
-    return n.toLocaleString('vi-VN') + 'đ';
-  }
-
-  // ===== QUẢN LÝ LƯỢNG KHÁCH =====
-  function changeQty(type, delta) {
-    const input = type === 'adults' ? document.getElementById('num_adults') :
-                  type === 'children' ? document.getElementById('num_children') :
-                  document.getElementById('num_infant');
-    const current = parseInt(input.value) || 0;
-    const newVal = Math.max(0, current + delta);
-    input.value = newVal;
-    updatePrice();
-  }
-
-  function updatePrice() {
-    const adults   = parseInt(document.getElementById('num_adults').value) || 1;
-    const children = parseInt(document.getElementById('num_children').value) || 0;  // 2-9 tuổi = 80%
-    const infants  = parseInt(document.getElementById('num_infant').value) || 0;    // <2 tuổi = miễn phí
-
-    // Tính giá: Adults 100%, Children 2-9 = 80%, Infants = 0%
-    const priceChildren = Math.round(tour.priceAdult * 0.8);
-    
-    const adultTotal = tour.priceAdult * adults;
-    const childTotal = priceChildren * children;
-    const infantTotal = 0; // Em bé miễn phí
-    const grand = adultTotal + childTotal + infantTotal;
-
-    // Cập nhật giá từng loại ở bên phải
-    document.getElementById('adultPrice').textContent = formatPrice(tour.priceAdult);
-    
-    if (children > 0) {
-      document.getElementById('childPrice').textContent = formatPrice(priceChildren);
-    } else {
-      document.getElementById('childPrice').textContent = '–';
-    }
-
-    // Cập nhật tóm tắt giá
-    document.getElementById('adultLabel').textContent = adults + ' người lớn';
-    document.getElementById('adultTotal').textContent = formatPrice(adultTotal);
-
-    const childRow = document.getElementById('childRow');
-    if (children > 0) {
-      childRow.style.display = 'flex';
-      document.getElementById('childLabel').textContent = children + ' trẻ em (80%)';
-      document.getElementById('childTotal').textContent = formatPrice(childTotal);
-    } else {
-      childRow.style.display = 'none';
-    }
-
-    document.getElementById('grandTotal').textContent = formatPrice(grand);
-  }
-
-  document.getElementById('num_adults').addEventListener('change', updatePrice);
-  document.getElementById('num_children').addEventListener('change', updatePrice);
-  document.getElementById('num_infant').addEventListener('change', updatePrice);
-  updatePrice();
-
-  // ===== VALIDATE =====
-  function validate() {
-    let ok = true;
-
-    const name  = document.getElementById('full_name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const date  = document.getElementById('departure_date').value;
-
-    // Tên
-    const grpName = document.getElementById('grp-name');
-    if (!name) { grpName.classList.add('error'); ok = false; }
-    else grpName.classList.remove('error');
-
-    // SĐT (10 số)
-    const grpPhone = document.getElementById('grp-phone');
-    if (!/^[0-9]{10}$/.test(phone.replace(/\s/g, ''))) {
-      grpPhone.classList.add('error'); ok = false;
-    } else grpPhone.classList.remove('error');
-
-    // Ngày
-    const grpDate = document.getElementById('grp-date');
-    if (!date || new Date(date) <= new Date()) {
-      grpDate.classList.add('error'); ok = false;
-    } else grpDate.classList.remove('error');
-
-    return ok;
-  }
-
-  // ===== SUBMIT FORM =====
-  document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Đang xử lý...';
-
-    const data = {
-      full_name:      document.getElementById('full_name').value.trim(),
-      phone:          document.getElementById('phone').value.trim().replace(/\s/g, ''),
-      email:          document.getElementById('email').value.trim(),
-      tour_id:        tourId,
-      departure_date: document.getElementById('departure_date').value,
-      num_adults:     parseInt(document.getElementById('num_adults').value),
-      num_children:   parseInt(document.getElementById('num_children').value),
-      num_infant:     parseInt(document.getElementById('num_infant').value) || 0,
-      note:           document.getElementById('note').value.trim()
-    };
-
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      const result = await res.json();
-
-      if (res.ok && result.booking_id) {
-        // Hiện trang thành công
-        document.getElementById('bookingContent').style.display = 'none';
-        const successPage = document.getElementById('successPage');
-        successPage.style.display = 'block';
-        document.getElementById('bookingCode').textContent = '#' + String(result.booking_id).padStart(4, '0');
-        document.getElementById('bookingTotal').textContent = formatPrice(result.total_price);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        throw new Error(result.error || 'Lỗi không xác định');
-      }
-
-    } catch (err) {
-      alert('❌ Đặt tour thất bại: ' + err.message + '\nVui lòng thử lại hoặc liên hệ hotline 0234 567 890');
-      btn.disabled = false;
-      btn.innerHTML = 'Xác Nhận Đặt Tour';
-    }
-  });
+    });
   </script>
 
 </body>
+
 </html>
