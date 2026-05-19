@@ -461,6 +461,78 @@
       margin-top: 0.2rem;
     }
 
+    /* ===== TOUR DESCRIPTION SECTION ===== */
+    .tour-description-section {
+      margin-top: 3rem;
+      padding: 2.5rem;
+      background: var(--dark3);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 6px;
+    }
+    .tour-desc-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      display: block;
+      text-align: center;
+    }
+    .tour-desc-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 2.5rem;
+      font-weight: 700;
+    }
+    .tour-desc-intro {
+      font-size: 0.95rem;
+      color: rgba(232,226,214,0.75);
+      line-height: 1.8;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      font-style: italic;
+    }
+    .desc-section {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .desc-section:last-child {
+      border-bottom: none;
+    }
+    .desc-section h3 {
+      font-family: var(--font-display);
+      color: var(--gold-light);
+      font-size: 1.2rem;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+    }
+    .desc-section p {
+      color: rgba(232,226,214,0.8);
+      line-height: 1.85;
+      font-size: 0.95rem;
+      margin-bottom: 0.6rem;
+    }
+    .desc-section .desc-highlight {
+      color: var(--gold-light);
+      font-style: italic;
+      padding: 0.6rem 1rem;
+      background: rgba(201,168,76,0.08);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 4px 4px 0;
+      margin-top: 0.6rem;
+    }
+    .desc-section .desc-highlight strong {
+      color: var(--gold);
+      font-style: normal;
+    }
+    @media (max-width: 600px) {
+      .tour-description-section { padding: 1.5rem; }
+      .desc-section h3 { font-size: 1.05rem; }
+    }
+
     /* ===== FORM ===== */
     .booking-form-wrap {
       background: var(--dark3);
@@ -881,6 +953,10 @@
           </div>
 
         </div>
+
+        <!-- Tour Description Section (hiển thị nếu tour có description) -->
+        <section id="tourDescriptionSection" class="tour-description-section" style="display:none"></section>
+
       </div>
 
       <!-- Success Page -->
@@ -912,6 +988,84 @@
 
   <script>
   // ===== DỮ LIỆU TOUR (khớp với database Railway và index.html) =====
+  // ===== GIỚI THIỆU TOUR (Description) =====
+  // Tour nào không có trong đây sẽ ẩn section giới thiệu
+  const TOUR_DESCRIPTIONS = {
+    1: {
+      label: 'Giới Thiệu',
+      title: 'Tour Di Sản UNESCO',
+      intro: 'Khám phá 5 di sản UNESCO của Cố Đô Huế – từ Quần thể di tích đến Nhã nhạc cung đình, Mộc bản, Châu bản và Thơ văn kiến trúc cung đình.',
+      sections: [
+        {
+          heading: '1. Quần thể di tích Cố đô Huế',
+          body: 'Quần thể di tích Cố đô Huế được UNESCO công nhận năm 1993, là di sản văn hóa thế giới đầu tiên của Việt Nam. Đây là trung tâm chính trị, văn hóa quan trọng suốt gần 400 năm (1558–1945). Hệ thống gồm Kinh thành, Hoàng thành và Tử Cấm Thành với kiến trúc hài hòa giữa Đông và Tây, gắn liền với cảnh quan thiên nhiên như sông Hương, núi Ngự Bình.',
+          highlight: 'tham quan Đại Nội, Ngọ Môn, điện Thái Hòa và các công trình cung đình đặc sắc.'
+        },
+        {
+          heading: '2. Nhã nhạc cung đình Huế',
+          body: 'Nhã nhạc là loại hình âm nhạc cung đình được UNESCO công nhận là di sản phi vật thể năm 2003. Đây là âm nhạc phục vụ các nghi lễ hoàng gia, mang giá trị nghệ thuật và tinh thần sâu sắc.',
+          highlight: 'thưởng thức biểu diễn Nhã nhạc truyền thống.'
+        },
+        {
+          heading: '3. Mộc bản triều Nguyễn',
+          body: 'Kho mộc bản gồm hơn 34.000 tấm khắc gỗ chứa các tài liệu lịch sử, văn hóa quan trọng của triều Nguyễn. Được UNESCO công nhận là di sản tư liệu thế giới năm 2009.',
+          highlight: 'tìm hiểu kỹ thuật in khắc cổ và lịch sử Việt Nam.'
+        },
+        {
+          heading: '4. Châu bản triều Nguyễn',
+          body: 'Châu bản là hệ thống văn bản hành chính có bút tích của các hoàng đế, phản ánh toàn diện đời sống xã hội thời Nguyễn. Được UNESCO công nhận năm 2014.',
+          highlight: 'khám phá dấu ấn quản lý và quyền lực triều đình.'
+        },
+        {
+          heading: '5. Thơ văn trên kiến trúc cung đình Huế',
+          body: 'Hệ thống gần 3.000 ô thơ văn được chạm khắc và trang trí trên các công trình cung đình. Đây là di sản độc đáo được UNESCO công nhận năm 2016.',
+          highlight: 'chiêm ngưỡng sự kết hợp giữa văn học và kiến trúc cung đình.'
+        },
+        {
+          heading: '6. Trải nghiệm văn hóa',
+          body: 'Ngoài ra, du khách còn có thể trải nghiệm các giá trị văn hóa như tín ngưỡng thờ Mẫu và nghệ thuật Bài Chòi.',
+          highlight: 'hòa mình vào không gian văn hóa truyền thống Huế.'
+        }
+      ]
+    }
+    // Có thể thêm description cho tour khác sau, ví dụ:
+    // 4: { ... description tour Lăng Tẩm ... }
+    // 8: { ... description tour Đầm Phá Tam Giang ... }
+  };
+
+  // Hàm render description theo tour ID
+  function renderTourDescription(tourId) {
+    const section = document.getElementById('tourDescriptionSection');
+    const desc = TOUR_DESCRIPTIONS[tourId];
+    
+    if (!desc) {
+      section.style.display = 'none';
+      return;
+    }
+
+    let html = `
+      <span class="tour-desc-label">${desc.label || 'Giới Thiệu'}</span>
+      <h2 class="tour-desc-title">${desc.title}</h2>
+    `;
+    
+    if (desc.intro) {
+      html += `<p class="tour-desc-intro">${desc.intro}</p>`;
+    }
+    
+    desc.sections.forEach(s => {
+      html += `
+        <div class="desc-section">
+          <h3>${s.heading}</h3>
+          <p>${s.body}</p>
+          ${s.highlight ? `<p class="desc-highlight">📍 <strong>Điểm nhấn:</strong> ${s.highlight}</p>` : ''}
+        </div>
+      `;
+    });
+    
+    section.innerHTML = html;
+    section.style.display = 'block';
+  }
+
   const TOURS = {
     1: {
       title: 'Cố Đô Huế Trọn Gói – Di Sản UNESCO',
@@ -1283,6 +1437,7 @@
   // Khởi tạo: cập nhật giá TRƯỚC, sau đó init date picker
   updatePrice();      // ← Chạy trước để giá luôn đúng
   initDatePicker();   // ← Chạy sau, nếu lỗi cũng không ảnh hưởng giá
+  renderTourDescription(tourId);  // ← Hiển thị phần giới thiệu tour (nếu có)
 
   // ===== TÍNH TIỀN =====
   function formatPrice(n) {
