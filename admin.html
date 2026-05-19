@@ -546,6 +546,41 @@ let allTours = [];
 let cancelBookingId = null;
 let dayInfoMap = {};  // ← Lưu thông tin từng ngày (block/schedule)
 
+// ═══════════════════════════════════════════════════════════
+// TOUR NAME OVERRIDES - sửa tên tour cũ trong DB → tên mới
+// (chỉ là band-aid, nên chạy update_tours.sql để fix gốc)
+// ═══════════════════════════════════════════════════════════
+const TOUR_OVERRIDES = {
+  1:  'Cố Đô Huế Trọn Gói – Di Sản UNESCO',
+  3:  'Khám Phá Ẩm Thực Huế',
+  4:  'Hành Trình Lăng Tẩm Triều Nguyễn',
+  5:  'Lăng Cô – Đèo Hải Vân – Rừng Ngập Mặn Rú Chá',
+  6:  'Hành Hương Chùa Huế – Tâm Linh Cố Đô',
+  8:  'Đầm Phá Tam Giang – Thiên Đường Hải Sản',
+  9:  'Vườn Quốc Gia Bạch Mã – Trekking Rừng Nguyên Sinh',
+  11: 'Huế 1 Ngày – Tour Ghép Tiết Kiệm',
+  12: 'Đạp Xe Xuyên Làng Huế – Mekong Style'
+};
+// IDs tours active (loại bỏ 2, 7, 10, 13, 14, 15 đã xoá khỏi website)
+const ACTIVE_TOUR_IDS = new Set([1, 3, 4, 5, 6, 8, 9, 11, 12]);
+
+// Helper: lấy tên tour đúng (ưu tiên override)
+function getTourTitle(id, fallback) {
+  return TOUR_OVERRIDES[id] || fallback || ('Tour ' + id);
+}
+
+// Map đổi tên cũ → mới (dùng khi không có tour_id, chỉ có title cũ trong DB)
+const TITLE_RENAME = {
+  'Khám Phá Ẩm Thực Cung Đình Huế'                : 'Khám Phá Ẩm Thực Huế',
+  'Lăng Cô – Đèo Hải Vân – Bãi Biển Thiên Đường'  : 'Lăng Cô – Đèo Hải Vân – Rừng Ngập Mặn Rú Chá',
+  'Khám Phá Đầm Phá Tam Giang'                    : 'Đầm Phá Tam Giang – Thiên Đường Hải Sản',
+  'Chinh Phục Bạch Mã – Thiên Đường Xanh'         : 'Vườn Quốc Gia Bạch Mã – Trekking Rừng Nguyên Sinh',
+  'Đạp Xe Xuyên Làng Huế – Trải Nghiệm Xanh'      : 'Đạp Xe Xuyên Làng Huế – Mekong Style'
+};
+function fixTitle(title) {
+  return TITLE_RENAME[title] || title;
+}
+
 // ── AUTH ──────────────────────────────────────────────────
 async function doLogin() {
   const username = document.getElementById('loginUser').value;
@@ -642,7 +677,7 @@ async function loadStats() {
     rb.innerHTML = data.recent.map(b => `
       <tr>
         <td><strong>${b.full_name}</strong><br><span style="color:var(--gray)">${b.phone}</span></td>
-        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.tour_title}</td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${fixTitle(b.tour_title)}</td>
         <td>${formatDate(b.departure_date)}</td>
         <td>${statusBadge(b.status)}</td>
       </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:2rem">Chưa có booking</td></tr>';
@@ -682,9 +717,9 @@ async function loadGroupView() {
     const groups = {};
     data.forEach(b => {
       if (b.status === 'Đã huỷ') return;
-      const key = `${b.departure_date?.split('T')[0]}_${b.tour_title}`;
+      const key = `${b.departure_date?.split('T')[0]}_${fixTitle(b.tour_title)}`;
       if (!groups[key]) groups[key] = {
-        date: b.departure_date, tour: b.tour_title,
+        date: b.departure_date, tour: fixTitle(b.tour_title),
         destination: b.destination_name, bookings: [],
         totalAdults: 0, totalChildren: 0, totalRevenue: 0
       };
@@ -754,7 +789,7 @@ async function loadBookings() {
         <td style="color:var(--gray)">#${b.id}</td>
         <td><strong>${b.full_name}</strong></td>
         <td><a href="https://zalo.me/${b.phone}" target="_blank" style="color:var(--blue)">${b.phone}</a></td>
-        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${b.tour_title}">${b.tour_title}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${fixTitle(b.tour_title)}">${fixTitle(b.tour_title)}</td>
         <td>${formatDate(b.departure_date)}</td>
         <td>${b.num_adults}NL${b.num_children > 0 ? ' + ' + b.num_children + 'TE' : ''}</td>
         <td style="color:var(--gold)">${formatPrice(b.total_price)}</td>
@@ -809,7 +844,12 @@ async function confirmCancel() {
 // ── CALENDAR ──────────────────────────────────────────────
 async function loadTours() {
   const res = await fetch('/api/tours');
-  allTours  = await res.json();
+  let tours = await res.json();
+
+  // ★ Filter chỉ giữ tours active + Override tên cho đúng
+  allTours = tours
+    .filter(t => ACTIVE_TOUR_IDS.has(t.id))
+    .map(t => ({ ...t, title: getTourTitle(t.id, t.title) }));
 
   // Dropdown chọn 1 tour
   const sel1 = document.getElementById('scheduleTourId');
@@ -882,7 +922,7 @@ async function renderCalendar() {
         ${isBlocked ? '<div class="cal-blocked-tag">🔴 Khoá</div>' : ''}
         ${tours.map((t, i) => `
           <span class="cal-tour-tag" style="background:${colors[i%colors.length]}22;color:${colors[i%colors.length]}">
-            ${t.tour_title?.substring(0,15) || 'Tour'}${t.is_blocked ? ' 🔒' : ''}
+            ${getTourTitle(t.tour_id, t.tour_title)?.substring(0,15)}${t.is_blocked ? ' 🔒' : ''}
           </span>`).join('')}
       </div>`;
     }
@@ -953,7 +993,7 @@ function openUnblockModal(dateStr) {
         <div>
           <div class="unblock-icon">🔒</div>
           <div>
-            <strong>${s.tour_title || 'Tour ' + s.tour_id}</strong>
+            <strong>${getTourTitle(s.tour_id, s.tour_title)}</strong>
             ${s.note ? `<small style="color:var(--gray);display:block">${s.note}</small>` : ''}
           </div>
         </div>

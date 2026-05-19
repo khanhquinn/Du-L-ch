@@ -5,6 +5,8 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+const { INDEX_TOUR_IDS } = require('./_tourCatalog');
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -16,15 +18,16 @@ module.exports = async (req, res) => {
       FROM tours t
       JOIN destinations d ON t.destination_id = d.id
       WHERE t.is_active = true
+        AND t.id = ANY($1::int[])
     `;
 
-    const params = [];
+    const params = [INDEX_TOUR_IDS];
     if (category && category !== 'all') {
-      query += ` AND t.category = $1`;
+      query += ` AND t.category = $2`;
       params.push(category);
     }
 
-    query += ` ORDER BY t.id`;
+    query += ` ORDER BY array_position($1::int[], t.id)`;
 
     const result = await pool.query(query, params);
     res.status(200).json(result.rows);

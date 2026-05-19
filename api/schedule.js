@@ -12,7 +12,7 @@ function toDateStr(d) {
   if (typeof d === 'string') return d.split('T')[0];
   if (d instanceof Date) {
     // Use UTC parts to avoid timezone shift
-    const y = d.getUTCFullYear();
+    const y = d.getUTCFullYeagit ();
     const m = String(d.getUTCMonth() + 1).padStart(2, '0');
     const day = String(d.getUTCDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;

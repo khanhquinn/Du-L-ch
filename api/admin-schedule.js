@@ -5,6 +5,8 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+const { INDEX_TOUR_IDS } = require('./_tourCatalog');
+
 async function checkAuth(req) {
   const token = req.headers['authorization']?.replace('Bearer ', '');
   if (!token) return false;
@@ -36,8 +38,9 @@ module.exports = async (req, res) => {
         JOIN tours t ON ts.tour_id = t.id
         WHERE EXTRACT(MONTH FROM ts.available_date) = $1
           AND EXTRACT(YEAR  FROM ts.available_date) = $2
+          AND t.id = ANY($3::int[])
         ORDER BY ts.available_date, t.id
-      `, [m, y]);
+      `, [m, y, INDEX_TOUR_IDS]);
 
       const blocked = await pool.query(`
         SELECT * FROM blocked_dates
@@ -54,6 +57,10 @@ module.exports = async (req, res) => {
     // POST: Thêm lịch tour hoặc khoá ngày
     if (req.method === 'POST') {
       const { type, tour_id, available_date, max_people, note, reason } = req.body;
+
+      if (tour_id && !INDEX_TOUR_IDS.includes(Number(tour_id))) {
+        return res.status(400).json({ error: 'Tour không thuộc danh sách trên trang chủ' });
+      }
 
       if (type === 'block') {
         // Khoá toàn bộ ngày
