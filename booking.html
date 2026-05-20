@@ -476,8 +476,23 @@
 
     .booking-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1.5fr;
+      grid-template-columns: 1.5fr 1fr;
       gap: 2rem;
+      align-items: start;
+    }
+
+    /* ===== LEFT COLUMN ===== */
+    .booking-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Top of left column: Image collage | Details panel side-by-side */
+    .tour-top {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1.5rem;
       align-items: start;
     }
 
@@ -489,9 +504,7 @@
       gap: 4px;
       border-radius: 4px;
       overflow: hidden;
-      aspect-ratio: 1.2 / 1;
-      position: sticky;
-      top: 100px;
+      aspect-ratio: 1 / 1;
     }
 
     .tour-images-grid img {
@@ -507,11 +520,13 @@
 
     /* ===== TOUR DETAILS PANEL ===== */
     .tour-details-panel {
-      position: sticky;
-      top: 100px;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      padding: 1.5rem;
+      background: var(--dark3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 4px;
     }
 
     .tour-details-panel h1 {
@@ -888,11 +903,8 @@
     }
 
     @media (max-width: 1024px) {
-      .booking-grid {
-        grid-template-columns: 1.2fr 1fr;
-      }
-      .booking-form-wrap {
-        grid-column: span 2;
+      .tour-top {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -900,12 +912,10 @@
       .booking-grid {
         grid-template-columns: 1fr;
       }
-      .tour-images-grid,
-      .tour-details-panel {
-        position: static;
+      .tour-top {
+        grid-template-columns: 1fr;
       }
       .booking-form-wrap {
-        grid-column: span 1;
         padding: 1.5rem;
       }
       .form-row {
@@ -946,43 +956,57 @@
       <div id="bookingContent">
         <div class="booking-grid">
 
-          <!-- Tour Images Collage (2x2 Grid) -->
-          <div class="tour-images-grid" id="tourImagesGrid">
-            <img id="tourImg1" src="assets/images/anh_chinh.jpg" alt="Tour 1" />
-            <img id="tourImg2" src="assets/images/anh_chinh.jpg" alt="Tour 2" />
-            <img id="tourImg3" src="assets/images/anh_chinh.jpg" alt="Tour 3" />
-            <img id="tourImg4" src="assets/images/anh_chinh.jpg" alt="Tour 4" />
+          <!-- ===== LEFT COLUMN: Tour Info + Description + Notes ===== -->
+          <div class="booking-left">
+
+            <!-- Top: Image collage + Tour details side-by-side -->
+            <div class="tour-top">
+              <!-- Tour Images Collage (2x2 Grid) -->
+              <div class="tour-images-grid" id="tourImagesGrid">
+                <img id="tourImg1" src="assets/images/anh_chinh.jpg" alt="Tour 1" />
+                <img id="tourImg2" src="assets/images/anh_chinh.jpg" alt="Tour 2" />
+                <img id="tourImg3" src="assets/images/anh_chinh.jpg" alt="Tour 3" />
+                <img id="tourImg4" src="assets/images/anh_chinh.jpg" alt="Tour 4" />
+              </div>
+
+              <!-- Tour Details Panel -->
+              <div class="tour-details-panel">
+                <div>
+                  <span class="tour-badge" id="tourBadge" style="display:none"></span>
+                </div>
+                <h1 id="tourTitle">Đang tải thông tin tour...</h1>
+                
+                <div class="tour-meta-list">
+                  <div class="tour-detail-row">
+                    <span>📍 Điểm đến</span>
+                    <span id="tourDest">–</span>
+                  </div>
+                  <div class="tour-detail-row">
+                    <span>⏱ Thời gian</span>
+                    <span id="tourDuration">–</span>
+                  </div>
+                  <div class="tour-detail-row">
+                    <span>👥 Tối đa</span>
+                    <span id="tourMax">–</span>
+                  </div>
+                </div>
+
+                <div class="price-highlight">
+                  <div class="label">Giá người lớn</div>
+                  <span class="amount" id="tourPrice">–</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tour Description Section (chỉ hiển thị nếu tour có description) -->
+            <section id="tourDescriptionSection" class="tour-description-section" style="display:none"></section>
+
+            <!-- Tour Notes Section (hiển thị cho mọi tour) -->
+            <section id="tourNotesSection" class="tour-notes-section"></section>
+
           </div>
 
-          <!-- Tour Details Panel -->
-          <div class="tour-details-panel">
-            <div>
-              <span class="tour-badge" id="tourBadge" style="display:none"></span>
-            </div>
-            <h1 id="tourTitle">Đang tải thông tin tour...</h1>
-            
-            <div class="tour-meta-list">
-              <div class="tour-detail-row">
-                <span>📍 Điểm đến</span>
-                <span id="tourDest">–</span>
-              </div>
-              <div class="tour-detail-row">
-                <span>⏱ Thời gian</span>
-                <span id="tourDuration">–</span>
-              </div>
-              <div class="tour-detail-row">
-                <span>👥 Tối đa</span>
-                <span id="tourMax">–</span>
-              </div>
-            </div>
-
-            <div class="price-highlight">
-              <div class="label">Giá người lớn</div>
-              <span class="amount" id="tourPrice">–</span>
-            </div>
-          </div>
-
-          <!-- Form -->
+          <!-- ===== RIGHT COLUMN: Booking Form ===== -->
           <div class="booking-form-wrap">
             <form id="bookingForm" novalidate>
 
@@ -1130,9 +1154,6 @@
           </div>
 
         </div>
-
-        <!-- Tour Description Section (hiển thị nếu tour có description) -->
-        <section id="tourDescriptionSection" class="tour-description-section" style="display:none"></section>
 
       </div>
 
