@@ -355,11 +355,11 @@
     </div>
     <div class="form-group">
       <label>Tên đăng nhập</label>
-      <input type="text" id="loginUser" placeholder="admin" value="admin"/>
+      <input type="text" id="loginUser" placeholder="Tên đăng nhập" autocomplete="username"/>
     </div>
     <div class="form-group">
       <label>Mật khẩu</label>
-      <input type="password" id="loginPass" placeholder="••••••••" value="hue2026"/>
+      <input type="password" id="loginPass" placeholder="Mật khẩu" autocomplete="current-password"/>
     </div>
     <button class="btn-login" onclick="doLogin()">Đăng Nhập</button>
     <div class="login-error" id="loginError"></div>
@@ -615,7 +615,8 @@
 
 <script>
 const API = '';
-let TOKEN = localStorage.getItem('hue_admin_token') || '';
+let TOKEN = '';
+localStorage.removeItem('hue_admin_token');
 let calYear  = new Date().getFullYear();
 let calMonth = new Date().getMonth() + 1;
 let allTours = [];
@@ -674,7 +675,6 @@ async function doLogin() {
     if (!res.ok) { err.textContent = data.error; err.style.display = 'block'; return; }
 
     TOKEN = data.token;
-    localStorage.setItem('hue_admin_token', TOKEN);
     showAdmin();
   } catch (e) {
     err.textContent = 'Lỗi kết nối server'; err.style.display = 'block';
@@ -696,9 +696,6 @@ function showAdmin() {
   loadTours();
   renderCalendar();
 }
-
-// Nếu đã có token, tự vào admin
-if (TOKEN) showAdmin();
 
 // Enter key for login
 document.addEventListener('keydown', e => {
