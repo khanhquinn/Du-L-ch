@@ -2003,6 +2003,14 @@ Thưởng thức trà, cà phê và tận hưởng không khí mát lạnh trên
     updatePrice();      // ← Chạy trước để giá luôn đúng
     initDatePicker();   // ← Chạy sau, nếu lỗi cũng không ảnh hưởng giá
     renderTourDescription(tourId);  // ← Hiển thị phần giới thiệu tour (nếu có)
+    if (window.location.hash === '#tourDescriptionSection') {
+      setTimeout(() => {
+        document.getElementById('tourDescriptionSection')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
 
     // ===== TÍNH TIỀN =====
     function formatPrice(n) {
