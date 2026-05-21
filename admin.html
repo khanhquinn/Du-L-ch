@@ -134,42 +134,112 @@
     .btn-done    { background: rgba(52,152,219,.2);  color: var(--blue); }
 
     /* ── CALENDAR ──────────────────────────── */
-    .calendar-controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-    .calendar-controls h3 { font-family: var(--serif); font-size: 1.2rem; color: var(--white); min-width: 150px; text-align: center; }
-    .btn-nav {
-      background: var(--dark3); border: 1px solid rgba(255,255,255,.08);
-      color: var(--text); width: 36px; height: 36px; border-radius: 4px;
-      cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
-      transition: border-color .2s;
+    .admin-calendar {
+      background: #1a1a1a;
+      border: 1px solid rgba(201,168,76,.3);
+      border-radius: 6px;
+      padding: 1rem;
+      user-select: none;
     }
-    .btn-nav:hover { border-color: var(--gold); color: var(--gold); }
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: .7rem;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: relative;
+    }
+    .calendar-controls h3 {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      color: var(--gold2);
+      min-width: 150px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .calendar-nav-group { display: flex; align-items: center; gap: .75rem; }
+    .btn-nav {
+      background: rgba(201,168,76,.1);
+      border: 1px solid rgba(201,168,76,.3);
+      color: var(--gold2);
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+    }
+    .btn-nav:hover { background: rgba(201,168,76,.25); }
     .btn-add-schedule {
-      margin-left: auto; background: var(--gold); color: var(--dark); border: none;
+      position: absolute; right: 0; background: var(--gold); color: var(--dark); border: none;
       padding: .5rem 1.2rem; border-radius: 4px; font-family: var(--font);
       font-size: .8rem; font-weight: 600; cursor: pointer; transition: background .2s;
     }
     .btn-add-schedule:hover { background: var(--gold2); }
 
-    .calendar-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 1rem;
+    .cal-weekdays,
+    .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
     }
-    .cal-day-name { text-align: center; padding: .5rem; font-size: .7rem; color: var(--gray); text-transform: uppercase; }
-    .cal-day {
-      background: var(--dark3); border: 1px solid rgba(255,255,255,.05);
-      border-radius: 4px; min-height: 80px; padding: .5rem; cursor: pointer;
-      transition: border-color .2s; position: relative;
+    .cal-weekdays { margin-bottom: 6px; }
+    .cal-weekday {
+      text-align: center;
+      color: var(--gray);
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: .4rem 0;
+      font-weight: 500;
     }
-    .cal-day:hover { border-color: rgba(201,168,76,.3); }
-    .cal-day.other-month { opacity: .3; }
-    .cal-day.today { border-color: var(--gold); }
-    .cal-day.blocked { background: rgba(231,76,60,.08); border-color: rgba(231,76,60,.2); }
-    .cal-day-num { font-size: .75rem; color: var(--gray); margin-bottom: .3rem; }
-    .cal-day.today .cal-day-num { color: var(--gold); font-weight: 600; }
+    .admin-calendar .cal-day {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      min-height: 86px;
+      padding: .45rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .admin-calendar .cal-day:hover:not(.empty) {
+      background: rgba(201,168,76,.15);
+      border-color: rgba(201,168,76,.3);
+    }
+    .admin-calendar .cal-day.empty { cursor: default; }
+    .admin-calendar .cal-day.today {
+      border-color: rgba(201,168,76,.5);
+      font-weight: 600;
+    }
+    .admin-calendar .cal-day.blocked {
+      color: #555;
+      background: rgba(220,38,38,.05);
+      border-color: rgba(220,38,38,.2);
+    }
+    .cal-day-num { font-size: .9rem; color: var(--text); margin-bottom: .35rem; line-height: 1; }
+    .cal-day.today .cal-day-num { color: var(--gold2); font-weight: 700; }
     .cal-tour-tag {
       font-size: .6rem; padding: .1rem .3rem; border-radius: 2px; margin-bottom: 2px;
       display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .cal-blocked-tag { font-size: .6rem; color: var(--red); font-weight: 600; }
+    .cal-blocked-tag { font-size: .6rem; color: var(--red); font-weight: 600; margin-bottom: 2px; }
+    .calendar-legend {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: .75rem;
+      color: var(--gray);
+    }
 
     /* ── MODAL ─────────────────────────────── */
     .modal-overlay {
@@ -267,6 +337,10 @@
       .main-content { margin-left: 60px; padding: 1rem; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .two-col { grid-template-columns: 1fr; }
+      .calendar-controls { justify-content: space-between; flex-wrap: wrap; }
+      .btn-add-schedule { position: static; width: 100%; }
+      .admin-calendar .cal-day { min-height: 64px; padding: .35rem; }
+      .cal-tour-tag { font-size: .55rem; }
     }
   </style>
 </head>
@@ -417,16 +491,18 @@
         <h1>Lịch Tour</h1>
         <p>Quản lý lịch khởi hành và khoá ngày không nhận khách</p>
       </div>
+      <div class="admin-calendar">
       <div class="calendar-controls">
         <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
         <h3 id="calMonthTitle">–</h3>
         <button class="btn-nav" onclick="changeMonth(1)">›</button>
         <button class="btn-add-schedule" onclick="openAddModal()">+ Thêm Lịch</button>
       </div>
-      <div class="calendar-grid" id="calDayNames"></div>
-      <div class="calendar-grid" id="calGrid"><div class="loading" style="grid-column:span 7"><div class="spinner-sm"></div></div></div>
+      <div class="cal-weekdays" id="calDayNames"></div>
+      <div class="cal-days" id="calGrid"><div class="loading" style="grid-column:span 7"><div class="spinner-sm"></div></div></div>
+      </div>
 
-      <div style="margin-top:1rem; display:flex; gap:1rem; font-size:.75rem; color:var(--gray)">
+      <div class="calendar-legend">
         <span>🟡 Tour đã lên lịch</span>
         <span>🔴 Ngày bị khoá</span>
         <span>⬜ Ngày trống</span>
@@ -868,8 +944,8 @@ async function renderCalendar() {
 
   // Day names
   const dn = document.getElementById('calDayNames');
-  dn.innerHTML = ['CN','T2','T3','T4','T5','T6','T7'].map(d =>
-    `<div class="cal-day-name">${d}</div>`).join('');
+  dn.innerHTML = ['T2','T3','T4','T5','T6','T7','CN'].map(d =>
+    `<div class="cal-weekday">${d}</div>`).join('');
 
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '<div class="loading" style="grid-column:span 7"><div class="spinner-sm"></div></div>';
@@ -878,7 +954,7 @@ async function renderCalendar() {
     const res  = await fetch(`/api/admin-schedule?month=${calMonth}&year=${calYear}`, { headers: authHeaders() });
     const data = await res.json();
 
-    const firstDay = new Date(calYear, calMonth-1, 1).getDay();
+    const firstDay = (new Date(calYear, calMonth-1, 1).getDay() + 6) % 7;
     const daysInMonth = new Date(calYear, calMonth, 0).getDate();
     const today = new Date().toDateString();
 
@@ -906,7 +982,7 @@ async function renderCalendar() {
 
     let html = '';
     // Ô trống đầu tháng
-    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day other-month"></div>';
+    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${calYear}-${String(calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
