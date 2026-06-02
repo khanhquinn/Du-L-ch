@@ -632,6 +632,84 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
+    /* ===== LỊCH TRÌNH CHI TIẾT ===== */
+    .itinerary-section {
+      margin: 1.5rem 0 2rem;
+    }
+
+    .itinerary-heading {
+      font-family: var(--font-display);
+      color: #000000;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--gold);
+      display: inline-block;
+    }
+
+    .itinerary-day {
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 12px rgba(140, 110, 70, 0.06);
+    }
+
+    .itinerary-day-title {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: #ffffff;
+      padding: 0.85rem 1.4rem;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .itinerary-list {
+      padding: 0.4rem 0;
+    }
+
+    .itinerary-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.7rem 1.4rem;
+      gap: 1rem;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+    }
+
+    .itinerary-item:last-child {
+      border-bottom: none;
+    }
+
+    .itinerary-time {
+      flex-shrink: 0;
+      width: 60px;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding-top: 1px;
+    }
+
+    .itinerary-activity {
+      color: #2b2823;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    @media (max-width: 600px) {
+      .itinerary-item {
+        flex-direction: column;
+        gap: 0.2rem;
+        padding: 0.6rem 1rem;
+      }
+      .itinerary-time {
+        font-size: 0.85rem;
+      }
+    }
+
     .desc-section:last-child {
       border-bottom: none;
     }
@@ -1360,6 +1438,29 @@
         html += `<p class="tour-desc-intro">${desc.intro}</p>`;
       }
 
+      // Render lịch trình chi tiết (nếu có)
+      const itinerary = TOUR_ITINERARIES[tourId];
+      if (itinerary && itinerary.days) {
+        html += `<div class="itinerary-section">
+          <h3 class="itinerary-heading">📅 Lịch Trình Chi Tiết</h3>`;
+        itinerary.days.forEach(day => {
+          html += `
+            <div class="itinerary-day">
+              <div class="itinerary-day-title">${day.title}</div>
+              <div class="itinerary-list">
+                ${day.items.map(item => `
+                  <div class="itinerary-item">
+                    <div class="itinerary-time">${item.time}</div>
+                    <div class="itinerary-activity">${item.activity}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
       desc.sections.forEach(s => {
         html += `
         <div class="desc-section">
@@ -1374,6 +1475,199 @@
       section.innerHTML = html;
       section.style.display = 'block';
     }
+
+    // ════════════════════ LỊCH TRÌNH CHI TIẾT THEO GIỜ ════════════════════
+    // Auto-generated dựa trên các địa điểm/nội dung trong TOUR_DESCRIPTIONS
+    // Tour 9 (Bạch Mã) và 11 (Tour ghép) đã có lịch trình theo giờ trong description gốc
+    const TOUR_ITINERARIES = {
+      // ─── Tour 1: Cố Đô Huế Trọn Gói (3 ngày 2 đêm) ─────────────────
+      1: {
+        days: [
+          {
+            title: 'Ngày 1: Khám Phá Đại Nội & Hoàng Thành',
+            items: [
+              { time: '07:30', activity: 'Đón khách tại khách sạn / điểm hẹn, khởi hành tham quan Đại Nội Huế' },
+              { time: '08:30', activity: 'Tham quan Ngọ Môn – cổng chính của Hoàng Thành Huế' },
+              { time: '09:30', activity: 'Khám phá Điện Thái Hòa – nơi diễn ra các nghi lễ quan trọng của triều Nguyễn' },
+              { time: '11:30', activity: 'Ăn trưa tại nhà hàng đặc sản cung đình Huế' },
+              { time: '13:30', activity: 'Tham quan Tử Cấm Thành – khu vực sinh hoạt của hoàng gia' },
+              { time: '15:00', activity: 'Khám phá Bảo tàng Mộc bản triều Nguyễn – di sản tư liệu UNESCO' },
+              { time: '17:00', activity: 'Nhận phòng khách sạn 3-4 sao, nghỉ ngơi' },
+              { time: '19:00', activity: 'Ăn tối, thưởng thức biểu diễn Nhã nhạc cung đình Huế' }
+            ]
+          },
+          {
+            title: 'Ngày 2: Di Sản Văn Hóa & Tín Ngưỡng',
+            items: [
+              { time: '07:00', activity: 'Ăn sáng tại khách sạn' },
+              { time: '08:00', activity: 'Tham quan Bảo tàng Châu bản triều Nguyễn' },
+              { time: '10:00', activity: 'Khám phá hệ thống Thơ văn trên kiến trúc cung đình – các ô thơ chạm khắc' },
+              { time: '11:30', activity: 'Ăn trưa với món Huế truyền thống' },
+              { time: '13:30', activity: 'Tham quan đền Voi Ré và đấu trường Hổ Quyền – dấu tích thời vua chúa' },
+              { time: '15:30', activity: 'Trải nghiệm tín ngưỡng thờ Mẫu, xem nghệ thuật Bài Chòi' },
+              { time: '18:00', activity: 'Ăn tối, dạo thuyền sông Hương về đêm' }
+            ]
+          },
+          {
+            title: 'Ngày 3: Tham Quan & Khởi Hành',
+            items: [
+              { time: '07:00', activity: 'Ăn sáng, trả phòng khách sạn' },
+              { time: '08:30', activity: 'Mua sắm đặc sản Huế tại chợ Đông Ba' },
+              { time: '10:30', activity: 'Tham quan Chùa Thiên Mụ – biểu tượng Cố Đô' },
+              { time: '12:00', activity: 'Ăn trưa, kết thúc tour, đưa khách về điểm hẹn' }
+            ]
+          }
+        ]
+      },
+
+      // ─── Tour 3: Khám Phá Ẩm Thực Huế (1 ngày 1 đêm) ──────────────
+      3: {
+        days: [
+          {
+            title: 'Ngày 1: Hành Trình Khám Phá Ẩm Thực Huế',
+            items: [
+              { time: '08:00', activity: 'Đón khách, khởi hành đi chợ Đông Ba – tham quan và tìm hiểu đặc sản' },
+              { time: '09:30', activity: 'Thưởng thức Bún bò Huế đặc trưng tại quán lâu đời nổi tiếng' },
+              { time: '11:00', activity: 'Khám phá ẩm thực bánh truyền thống: Bánh bèo, Bánh nậm, Bánh bột lọc, Bánh ram ít' },
+              { time: '12:30', activity: 'Nghỉ trưa, thưởng thức Cơm hến / Bún hến – món dân dã đặc trưng' },
+              { time: '14:00', activity: 'Tham quan làng nghề làm Mè xửng, Mắm tôm chua – đặc sản làm quà' },
+              { time: '16:00', activity: 'Thưởng thức Bánh khoái với nước lèo đặc trưng' },
+              { time: '18:00', activity: 'Ăn tối với Nem lụi, Tré Huế, Bánh canh Nam Phổ' },
+              { time: '20:00', activity: 'Thưởng thức Chè Huế – hơn 20 loại chè thanh mát' },
+              { time: '21:30', activity: 'Nhận phòng khách sạn, nghỉ ngơi' }
+            ]
+          }
+        ]
+      },
+
+      // ─── Tour 4: Lăng Tẩm Triều Nguyễn (2 ngày 1 đêm) ─────────────
+      4: {
+        days: [
+          {
+            title: 'Ngày 1: Lăng Tẩm Phía Tây Nam',
+            items: [
+              { time: '07:30', activity: 'Đón khách, khởi hành tham quan Lăng Gia Long (Thiên Thọ Lăng) – lăng vị vua đầu triều Nguyễn' },
+              { time: '09:30', activity: 'Khám phá Lăng Minh Mạng – kiến trúc đăng đối, uy nghi với 40 công trình' },
+              { time: '11:30', activity: 'Ăn trưa tại nhà hàng địa phương' },
+              { time: '13:30', activity: 'Tham quan Lăng Thiệu Trị (Xương Lăng) – không gian thanh bình, hài hòa thiên nhiên' },
+              { time: '15:30', activity: 'Khám phá Lăng Tự Đức (Khiêm Lăng) – lăng thơ mộng nhất Huế, công viên rộng 12ha' },
+              { time: '17:30', activity: 'Nhận phòng khách sạn, nghỉ ngơi' },
+              { time: '19:00', activity: 'Ăn tối, dạo phố cổ Huế về đêm' }
+            ]
+          },
+          {
+            title: 'Ngày 2: Lăng Tẩm Phía Đông',
+            items: [
+              { time: '07:00', activity: 'Ăn sáng tại khách sạn, trả phòng' },
+              { time: '08:00', activity: 'Tham quan Lăng Dục Đức (An Lăng) – nơi an nghỉ 3 vị vua Dục Đức, Thành Thái, Duy Tân' },
+              { time: '10:00', activity: 'Khám phá Lăng Đồng Khánh (Tư Lăng) – giao thoa kiến trúc Á–Âu độc đáo' },
+              { time: '12:00', activity: 'Ăn trưa với đặc sản Huế' },
+              { time: '13:30', activity: 'Tham quan Lăng Khải Định (Ứng Lăng) – kiến trúc cầu kỳ ảnh hưởng châu Âu' },
+              { time: '15:30', activity: 'Mua sắm đặc sản, quà lưu niệm' },
+              { time: '17:00', activity: 'Khởi hành về điểm đón, kết thúc tour' }
+            ]
+          }
+        ]
+      },
+
+      // ─── Tour 5: Lăng Cô – Hải Vân – Rú Chá (2 ngày 1 đêm) ────────
+      5: {
+        days: [
+          {
+            title: 'Ngày 1: Vịnh Lăng Cô & Đèo Hải Vân',
+            items: [
+              { time: '07:30', activity: 'Đón khách tại khách sạn, khởi hành đi Vịnh Lăng Cô' },
+              { time: '09:30', activity: 'Đến Vịnh Lăng Cô – tắm biển, check-in cát trắng nước trong xanh' },
+              { time: '12:00', activity: 'Ăn trưa với hải sản tươi sống tại nhà hàng ven biển' },
+              { time: '14:00', activity: 'Khởi hành chinh phục Đèo Hải Vân – "Thiên hạ đệ nhất hùng quan" dài 21km' },
+              { time: '15:30', activity: 'Tham quan Hải Vân Quan – cửa ải xưa được xây từ thời nhà Trần' },
+              { time: '17:00', activity: 'Quay về resort/khách sạn Lăng Cô, nhận phòng nghỉ ngơi' },
+              { time: '19:00', activity: 'Ăn tối, thưởng thức không khí biển đêm' }
+            ]
+          },
+          {
+            title: 'Ngày 2: Rừng Ngập Mặn Rú Chá',
+            items: [
+              { time: '07:00', activity: 'Ăn sáng tại khách sạn, trả phòng' },
+              { time: '08:30', activity: 'Khởi hành về Huế, đi tham quan Rừng ngập mặn Rú Chá ở làng Thuận Hòa' },
+              { time: '10:00', activity: 'Khám phá khu rừng ngập mặn nguyên sinh 5ha – di sản đầm phá Tam Giang' },
+              { time: '11:30', activity: 'Thưởng thức hải sản đầm phá tại làng' },
+              { time: '14:00', activity: 'Tham quan cầu gỗ giữa rừng chá – góc check-in nổi tiếng' },
+              { time: '16:00', activity: 'Khởi hành về Huế, kết thúc tour' }
+            ]
+          }
+        ]
+      },
+
+      // ─── Tour 6: Hành Hương Chùa Huế (1 ngày) ─────────────────────
+      6: {
+        days: [
+          {
+            title: 'Ngày 1: Hành Hương 6 Ngôi Chùa Linh Thiêng',
+            items: [
+              { time: '06:30', activity: 'Đón khách tại khách sạn, khởi hành lên Thiền viện Trúc Lâm Bạch Mã' },
+              { time: '08:00', activity: 'Tham quan Thiền viện Trúc Lâm Bạch Mã – vượt 172 bậc lên chính điện' },
+              { time: '10:00', activity: 'Viếng Chùa Từ Đàm – ngôi chùa cổ kính (~năm 1695) gắn lịch sử Phật giáo Huế' },
+              { time: '11:00', activity: 'Khám phá Chùa Huyền Không Sơn Thượng – "cõi Phật chốn trần gian" hệ phái Nam Tông' },
+              { time: '12:30', activity: 'Dùng cơm chay tại chùa hoặc nhà hàng' },
+              { time: '14:00', activity: 'Viếng Chùa Báo Quốc trên đồi Hàm Long – giếng nước linh thiêng' },
+              { time: '15:30', activity: 'Tham quan Chùa Diệu Đế – một trong ba Quốc tự còn tồn tại tại Huế' },
+              { time: '16:30', activity: 'Khám phá Chùa Từ Hiếu – ngôi chùa thơ mộng giữa rừng thông đồi Thủy Xuân' },
+              { time: '18:00', activity: 'Đưa khách về điểm hẹn, kết thúc tour' }
+            ]
+          }
+        ]
+      },
+
+      // ─── Tour 8: Đầm Phá Tam Giang (2 ngày 1 đêm) ─────────────────
+      8: {
+        days: [
+          {
+            title: 'Ngày 1: Hoàng Hôn Phá Tam Giang',
+            items: [
+              { time: '13:00', activity: 'Đón khách tại khách sạn, khởi hành ra Phá Tam Giang – hệ đầm phá lớn nhất Việt Nam' },
+              { time: '14:30', activity: 'Đi thuyền tham quan đầm phá 52km² (3 sông Hương, Ô Lâu, Bồ hội tụ)' },
+              { time: '16:00', activity: 'Thăm làng chài cổ Thái Dương Hạ – khám phá đời sống ngư dân bình dị' },
+              { time: '17:30', activity: 'Săn hoàng hôn trên Phá Tam Giang – cảnh đẹp lừng danh "đệ nhất đầm phá"' },
+              { time: '19:00', activity: 'Ăn tối với hải sản tươi: lẩu cá dìa, hàu nướng mỡ hành, tôm ghẹ tươi' },
+              { time: '21:00', activity: 'Nhận phòng homestay ven phá, nghỉ ngơi' }
+            ]
+          },
+          {
+            title: 'Ngày 2: Bình Minh & Rừng Ngập Mặn',
+            items: [
+              { time: '05:30', activity: 'Dậy sớm săn bình minh trên Phá Tam Giang' },
+              { time: '07:00', activity: 'Ăn sáng với Bánh khoái cá kình – đặc sản đầm phá' },
+              { time: '09:00', activity: 'Tham quan Rừng ngập mặn Rú Chá – check-in rặng chá cổ thụ' },
+              { time: '11:00', activity: 'Trải nghiệm chèo thuyền nhỏ quanh đầm phá' },
+              { time: '12:30', activity: 'Ăn trưa với hải sản đặc sản đầm phá' },
+              { time: '14:30', activity: 'Mua đặc sản đầm phá làm quà' },
+              { time: '16:00', activity: 'Khởi hành về Huế, kết thúc tour' }
+            ]
+          }
+        ]
+      },
+
+      // ─── Tour 12: Đạp Xe Xuyên Làng (1 ngày) ──────────────────────
+      12: {
+        days: [
+          {
+            title: 'Ngày 1: Đạp Xe Khám Phá Làng Huế',
+            items: [
+              { time: '07:30', activity: 'Đón khách tại khách sạn, nhận xe đạp và thiết bị bảo hộ' },
+              { time: '08:00', activity: 'Khởi hành đến Vườn Kim Long – làng vườn cổ ~400 năm tuổi' },
+              { time: '09:30', activity: 'Tham quan nhà vườn truyền thống, thưởng thức trà Huế giữa không gian xanh' },
+              { time: '10:30', activity: 'Đạp xe đến Làng Thủy Biều – thưởng thức thanh trà đặc sản' },
+              { time: '12:00', activity: 'Ăn trưa với món Huế đặc trưng tại nhà vườn' },
+              { time: '13:30', activity: 'Tham quan đấu trường Hổ Quyền & Voi Ré – di tích lịch sử thời vua chúa Nguyễn' },
+              { time: '15:00', activity: 'Tiếp tục đạp xe đến Cầu Ngói Thanh Toàn – cây cầu cổ ~240 năm tuổi' },
+              { time: '16:30', activity: 'Trải nghiệm chợ quê và đời sống làng Thanh Toàn' },
+              { time: '17:30', activity: 'Đạp xe về điểm xuất phát, kết thúc tour' }
+            ]
+          }
+        ]
+      }
+    };
 
     const TOURS = {
       1: {
