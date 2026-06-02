@@ -1029,9 +1029,10 @@
                   <input type="tel" id="phone" placeholder="0901 234 567" />
                   <div class="form-error">SĐT không hợp lệ (10 số)</div>
                 </div>
-                <div class="form-group">
-                  <label>Email</label>
+                <div class="form-group" id="grp-email">
+                  <label>Email *</label>
                   <input type="email" id="email" placeholder="email@gmail.com" />
+                  <div class="form-error">Email không hợp lệ</div>
                 </div>
               </div>
 
@@ -1880,6 +1881,7 @@
 
       const name = document.getElementById('full_name').value.trim();
       const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
       const date = document.getElementById('departure_date').value;
 
       // Tên
@@ -1892,6 +1894,12 @@
       if (!/^[0-9]{10}$/.test(phone.replace(/\s/g, ''))) {
         grpPhone.classList.add('error'); ok = false;
       } else grpPhone.classList.remove('error');
+
+      // Email (bắt buộc + đúng định dạng)
+      const grpEmail = document.getElementById('grp-email');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        grpEmail.classList.add('error'); ok = false;
+      } else grpEmail.classList.remove('error');
 
       // Ngày
       const grpDate = document.getElementById('grp-date');
