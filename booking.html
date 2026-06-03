@@ -1268,6 +1268,12 @@
   </div>
 
   <script>
+    const CUSTOMER_TOKEN = localStorage.getItem('hue_customer_token') || '';
+    if (!CUSTOMER_TOKEN) {
+      const redirect = 'booking.html' + window.location.search + window.location.hash;
+      window.location.replace('login.html?redirect=' + encodeURIComponent(redirect));
+    }
+
     // ===== DỮ LIỆU TOUR (khớp với database Railway và index.html) =====
     // ===== GIỚI THIỆU TOUR (Description) =====
     // Tour nào không có trong đây sẽ ẩn section giới thiệu
@@ -1829,6 +1835,11 @@
     const tourId = parseInt(params.get('tour')) || 1;
     const tour = TOURS[tourId] || TOURS[1];
 
+    const savedCustomerName = localStorage.getItem('hue_customer_name') || '';
+    const savedCustomerEmail = localStorage.getItem('hue_customer_email') || '';
+    if (savedCustomerName) document.getElementById('full_name').value = savedCustomerName;
+    if (savedCustomerEmail) document.getElementById('email').value = savedCustomerEmail;
+
     // ===== HIỂN THỊ THÔNG TIN TOUR =====
     if (tour.images && tour.images.length === 4) {
       document.getElementById('tourImg1').src = tour.images[0];
@@ -2228,11 +2239,21 @@
       try {
         const res = await fetch('/api/bookings', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + CUSTOMER_TOKEN
+          },
           body: JSON.stringify(data)
         });
 
         const result = await res.json();
+
+        if (res.status === 401) {
+          localStorage.removeItem('hue_customer_token');
+          const redirect = 'booking.html' + window.location.search + window.location.hash;
+          window.location.href = 'login.html?redirect=' + encodeURIComponent(redirect);
+          return;
+        }
 
         if (res.ok && result.booking_id) {
           // Hiện trang thành công

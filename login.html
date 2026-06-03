@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập khách hàng - Huế Tour</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark: #2b2823; --dark2: #ffffff; --gold: #b8943f; --gold2: #c9a84c;
+      --white: #2b2823; --gray: #94897b; --text: #5d564c; --red: #e74c3c; --green: #2ecc71;
+      --font: 'DM Sans', sans-serif; --serif: 'Playfair Display', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #f6f0e7 0%, #f8e8da 45%, #f4ddd4 100%);
+      color: var(--text); font-family: var(--font); font-size: 14px; padding: 1.5rem;
+    }
+    a { color: inherit; text-decoration: none; }
+    .login-box {
+      background: #ffffff; border: 1px solid rgba(184,148,63,.25);
+      border-radius: 8px; padding: 2.5rem; width: min(100%, 380px);
+      box-shadow: 0 10px 40px rgba(140,110,70,0.12);
+    }
+    .login-logo { text-align: center; margin-bottom: 2rem; }
+    .login-logo h1 { font-family: var(--serif); font-size: 2.5rem; color: var(--white); }
+    .login-logo p { font-size: .75rem; color: var(--gold); letter-spacing: .2em; text-transform: uppercase; }
+    .form-title { font-family: var(--serif); color: var(--white); font-size: 1.35rem; margin-bottom: 1.2rem; text-align: center; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: .75rem; color: var(--gray); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .05em; }
+    .form-group input {
+      width: 100%; background: var(--dark2); border: 1px solid rgba(0,0,0,.08);
+      color: var(--white); padding: .75rem 1rem; border-radius: 4px;
+      font-family: var(--font); font-size: .9rem; outline: none; transition: border .2s;
+    }
+    .form-group input:focus { border-color: var(--gold); }
+    .btn-login {
+      width: 100%; background: var(--gold); color: var(--dark); border: none;
+      padding: .85rem; border-radius: 4px; font-family: var(--font); font-size: .95rem;
+      font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .btn-login:hover { background: var(--gold2); }
+    .auth-switch { margin-top: 1rem; text-align: center; color: var(--gray); font-size: .86rem; }
+    .auth-switch button {
+      background: none; border: 0; color: var(--gold); font: inherit; font-weight: 600;
+      cursor: pointer; padding: 0;
+    }
+    .auth-message { font-size: .82rem; margin-top: .85rem; text-align: center; display: none; line-height: 1.5; }
+    .auth-message.error { color: var(--red); }
+    .auth-message.notice { color: var(--gold); }
+    #registerForm { display: none; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="index.html">
+        <h1>Huế</h1>
+        <p>Customer Account</p>
+      </a>
+    </div>
+
+    <form id="loginForm">
+      <h2 class="form-title">Đăng Nhập</h2>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="email@gmail.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="loginPass" placeholder="Nhập mật khẩu" autocomplete="current-password"/>
+      </div>
+      <button class="btn-login" type="submit">Đăng Nhập</button>
+      <div class="auth-switch">Bạn chưa có tài khoản? <button type="button" id="showRegister">Đăng kí ngay</button>.</div>
+      <div class="auth-message error" id="loginError"></div>
+      <div class="auth-message notice" id="loginNotice"></div>
+    </form>
+
+    <form id="registerForm">
+      <h2 class="form-title">Đăng Kí</h2>
+      <div class="form-group">
+        <label>Tên khách hàng</label>
+        <input type="text" id="registerName" placeholder="Nguyễn Văn A" autocomplete="name"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="registerEmail" placeholder="email@gmail.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="registerPass" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password"/>
+      </div>
+      <button class="btn-login" type="submit">Đăng Kí</button>
+      <div class="auth-switch">Bạn đã có tài khoản? <button type="button" id="showLogin">Đăng nhập</button>.</div>
+      <div class="auth-message error" id="registerError"></div>
+    </form>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const redirectTarget = safeRedirect(params.get('redirect') || 'booking.html');
+
+    function safeRedirect(value) {
+      if (!value || /^https?:\/\//i.test(value) || value.startsWith('//')) return 'booking.html';
+      return value;
+    }
+
+    function showMessage(el, text, visible = true) {
+      el.textContent = text;
+      el.style.display = visible ? 'block' : 'none';
+    }
+
+    function switchForm(mode) {
+      document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
+      showMessage(document.getElementById('loginError'), '', false);
+      showMessage(document.getElementById('loginNotice'), '', false);
+      showMessage(document.getElementById('registerError'), '', false);
+    }
+
+    document.getElementById('showRegister').addEventListener('click', () => switchForm('register'));
+    document.getElementById('showLogin').addEventListener('click', () => switchForm('login'));
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('loginError');
+      showMessage(err, '', false);
+
+      try {
+        const res = await fetch('/api/customer-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value.trim(),
+            password: document.getElementById('loginPass').value
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showMessage(err, data.error || 'Đăng nhập thất bại');
+          return;
+        }
+
+        localStorage.setItem('hue_customer_token', data.token);
+        localStorage.setItem('hue_customer_name', data.full_name || '');
+        localStorage.setItem('hue_customer_email', data.email || '');
+        window.location.href = redirectTarget;
+      } catch (error) {
+        showMessage(err, 'Lỗi kết nối server');
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('registerError');
+      showMessage(err, '', false);
+
+      try {
+        const res = await fetch('/api/customer-register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            full_name: document.getElementById('registerName').value.trim(),
+            email: document.getElementById('registerEmail').value.trim(),
+            password: document.getElementById('registerPass').value
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showMessage(err, data.error || 'Đăng kí thất bại');
+          return;
+        }
+
+        document.getElementById('loginEmail').value = document.getElementById('registerEmail').value.trim();
+        document.getElementById('loginPass').value = '';
+        document.getElementById('registerForm').reset();
+        switchForm('login');
+        showMessage(document.getElementById('loginNotice'), 'Đăng kí thành công. Vui lòng đăng nhập để đặt tour.');
+      } catch (error) {
+        showMessage(err, 'Lỗi kết nối server');
+      }
+    });
+  </script>
+</body>
+</html>

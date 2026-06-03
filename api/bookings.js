@@ -352,12 +352,25 @@ async function sendBookingEmail(data) {
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
+    const token = req.headers['authorization']?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ error: 'Vui lòng đăng nhập trước khi đặt tour' });
+    }
+
+    const account = await pool.query(
+      'SELECT id FROM customer_accounts WHERE token = $1 AND token_exp > NOW()',
+      [token]
+    );
+    if (account.rows.length === 0) {
+      return res.status(401).json({ error: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại' });
+    }
+
     const {
       full_name, phone, email,
       tour_id, departure_date,
