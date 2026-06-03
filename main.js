@@ -25,16 +25,6 @@ if (navToggle) {
   });
 }
 
-// ===== FILTER TOURS =====
-document.querySelectorAll('a[href^="booking.html"]').forEach(link => {
-  link.addEventListener('click', (event) => {
-    if (localStorage.getItem('hue_customer_token')) return;
-    event.preventDefault();
-    const href = link.getAttribute('href') || 'booking.html';
-    window.location.href = 'login.html?redirect=' + encodeURIComponent(href);
-  });
-});
-
 const filterBtns = document.querySelectorAll('.filter-btn');
 const tourCards  = document.querySelectorAll('.tour-card');
 

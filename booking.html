@@ -1267,6 +1267,7 @@
     </div>
   </div>
 
+  <script src="customer-nav.js"></script>
   <script>
     const CUSTOMER_TOKEN = localStorage.getItem('hue_customer_token') || '';
     if (!CUSTOMER_TOKEN) {
@@ -1838,7 +1839,11 @@
     const savedCustomerName = localStorage.getItem('hue_customer_name') || '';
     const savedCustomerEmail = localStorage.getItem('hue_customer_email') || '';
     if (savedCustomerName) document.getElementById('full_name').value = savedCustomerName;
-    if (savedCustomerEmail) document.getElementById('email').value = savedCustomerEmail;
+    if (savedCustomerEmail) {
+      const emailInput = document.getElementById('email');
+      emailInput.value = savedCustomerEmail;
+      emailInput.readOnly = true;
+    }
 
     // ===== HIỂN THỊ THÔNG TIN TOUR =====
     if (tour.images && tour.images.length === 4) {
