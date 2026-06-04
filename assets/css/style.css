@@ -736,7 +736,7 @@ body {
   }
 }
 
-/* ===== FILTER TABS ===== */
+
 .filter-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -769,7 +769,7 @@ body {
   font-weight: 500;
 }
 
-/* ===== TOUR META ===== */
+
 .tour-meta {
   display: flex;
   gap: 1rem;
@@ -790,7 +790,7 @@ body {
   backdrop-filter: blur(4px);
 }
 
-/* ===== HIDE FILTERED CARDS ===== */
+
 .tour-card.hidden {
   display: none;
 }
