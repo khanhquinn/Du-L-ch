@@ -10,8 +10,9 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-
+    /* ===== CUSTOM CALENDAR (tour tự chọn ngày) ===== */
     .inline-calendar-label {
       font-size: 0.85rem;
       color: var(--gold-light);
@@ -169,7 +170,7 @@
   </style>
 
   <style>
-
+    /* ===== SCHEDULE TABLE (BẢNG GIÁ THEO THÁNG) ===== */
     .schedule-title {
       font-family: var(--font-display);
       font-size: 1.15rem;
@@ -438,7 +439,7 @@
       }
     }
 
-
+    /* ===== BOOKING PAGE STYLES ===== */
     .booking-page {
       min-height: 100vh;
       background: linear-gradient(135deg, #f6f0e7 0%, #f8e8da 45%, #f4ddd4 100%);
@@ -482,7 +483,7 @@
       align-items: start;
     }
 
-
+    /* ===== LEFT COLUMN ===== */
     .booking-left {
       display: flex;
       flex-direction: column;
@@ -497,7 +498,7 @@
       align-items: start;
     }
 
-
+    /* ===== TOUR IMAGES COLLAGE ===== */
     .tour-images-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -519,7 +520,7 @@
       transform: scale(1.03);
     }
 
-
+    /* ===== TOUR DETAILS PANEL ===== */
     .tour-details-panel {
       display: flex;
       flex-direction: column;
@@ -589,7 +590,7 @@
       font-weight: 700;
     }
 
-
+    /* ===== TOUR DESCRIPTION SECTION ===== */
     .tour-description-section {
       margin-top: 3rem;
       padding: 2.5rem;
@@ -632,7 +633,7 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-
+    /* ===== LỊCH TRÌNH CHI TIẾT ===== */
     .itinerary-section {
       margin: 1.5rem 0 2rem;
     }
@@ -754,7 +755,7 @@
       }
     }
 
-
+    /* ===== FORM ===== */
     .booking-form-wrap {
       background: var(--dark3);
       border: 1px solid rgba(0, 0, 0, 0.05);
@@ -902,7 +903,7 @@
       transform: none;
     }
 
-
+    /* ===== SUCCESS PAGE ===== */
     .success-page {
       display: none;
       text-align: center;
@@ -1005,6 +1006,381 @@
       }
     }
   </style>
+
+  <style>
+    /* ===== REVIEWS SECTION ===== */
+    .reviews-section {
+      margin-top: 2.5rem;
+      padding: 2rem 2.5rem;
+      background: var(--dark3);
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      border-radius: 6px;
+    }
+
+    .reviews-section-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--gold);
+      display: inline-block;
+    }
+
+    /* Tổng quan điểm */
+    .reviews-summary {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.8rem;
+      padding: 1.2rem;
+      background: rgba(201, 168, 76, 0.06);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 6px;
+    }
+
+    .reviews-avg-score {
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .reviews-avg-score .score {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      color: var(--gold-light);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .reviews-avg-score .out-of {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
+    .reviews-summary-stars {
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      line-height: 1.2;
+    }
+
+    .reviews-summary-count {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    /* Form đánh giá */
+    .review-form-wrap {
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 6px;
+      padding: 1.5rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .review-form-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gold-light);
+      margin-bottom: 1rem;
+    }
+
+    /* Star selector */
+    .star-selector {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .star-selector span {
+      font-size: 2rem;
+      color: #ccc;
+      transition: color 0.1s, transform 0.1s;
+      line-height: 1;
+    }
+
+    .star-selector span.active {
+      color: #f5a623;
+      transform: scale(1.15);
+    }
+
+    .star-selector span:hover {
+      transform: scale(1.2);
+    }
+
+    .review-textarea {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      color: #2b2823;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 90px;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    .review-textarea:focus {
+      border-color: var(--gold);
+    }
+
+    .review-textarea::placeholder {
+      color: rgba(93, 84, 76, 0.5);
+    }
+
+    .btn-submit-review {
+      margin-top: 0.8rem;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 0.65rem 1.6rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-submit-review:hover {
+      background: var(--gold-light);
+    }
+
+    .btn-submit-review:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+    }
+
+    .review-msg {
+      font-size: 0.82rem;
+      margin-top: 0.5rem;
+      min-height: 1rem;
+    }
+
+    .review-login-notice {
+      padding: 0.8rem 1rem;
+      background: rgba(201, 168, 76, 0.06);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-bottom: 1.5rem;
+    }
+
+    .review-login-notice a {
+      color: var(--gold-light);
+      text-decoration: underline;
+    }
+
+    /* Danh sách review cards */
+    .reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .review-card {
+      background: #ffffff;
+      border-radius: 6px;
+      padding: 1.2rem 1.4rem;
+      border: 1px solid rgba(0, 0, 0, 0.07);
+      box-shadow: 0 2px 8px rgba(140, 110, 70, 0.06);
+    }
+
+    .review-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .review-author {
+      font-weight: 600;
+      color: #1a1a1a;
+      font-size: 0.95rem;
+    }
+
+    .review-date {
+      font-size: 0.75rem;
+      color: #999;
+    }
+
+    .review-stars {
+      color: #f5a623;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .review-content {
+      color: #444;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .reviews-empty {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .reviews-section {
+        padding: 1.5rem;
+      }
+
+      .reviews-summary {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+
+  <style>
+    /* ===== MOMO PAYMENT ===== */
+    .momo-payment-wrap {
+      background: #fff0f9;
+      border: 2px solid #d82d8b;
+      border-radius: 12px;
+      padding: 1.8rem;
+      max-width: 420px;
+      margin: 2rem auto 0;
+      text-align: center;
+    }
+
+    .momo-payment-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .momo-logo {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .momo-payment-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #d82d8b;
+    }
+
+    .momo-qr-box {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #f0c0df;
+      margin-bottom: 1.2rem;
+    }
+
+    .momo-info-box {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 2.1;
+      margin-bottom: 1rem;
+      border: 1px solid #f0c0df;
+    }
+
+    .momo-info-box strong {
+      color: #333;
+    }
+
+    .momo-amount-highlight {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #d82d8b;
+    }
+
+    .momo-note {
+      font-size: 0.78rem;
+      color: #999;
+      margin-bottom: 1.2rem;
+      line-height: 1.6;
+    }
+
+    .btn-momo-confirm {
+      width: 100%;
+      background: #d82d8b;
+      color: #fff;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-momo-confirm:hover:not(:disabled) {
+      background: #b5247a;
+      transform: translateY(-1px);
+    }
+
+    .btn-momo-confirm:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .momo-paid-msg {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      min-height: 1.2rem;
+    }
+
+    /* Step 2: Đã xác nhận chuyển khoản */
+    .success-step2 {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .success-step2 .step2-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-step2 h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+
+    .success-step2 .step2-badge {
+      display: inline-block;
+      background: rgba(216, 45, 139, 0.15);
+      border: 1px solid rgba(216, 45, 139, 0.5);
+      border-radius: 20px;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.85rem;
+      color: #e87abf;
+      margin-bottom: 1.2rem;
+    }
+
+    .success-step2 p {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+  </style>
 </head>
 
 <body>
@@ -1082,6 +1458,58 @@
 
             <!-- Tour Description Section (chỉ hiển thị nếu tour có description) -->
             <section id="tourDescriptionSection" class="tour-description-section" style="display:none"></section>
+
+            <!-- ===== REVIEWS SECTION ===== -->
+            <section class="reviews-section" id="reviewsSection">
+              <h2 class="reviews-section-title">⭐ Đánh Giá Của Khách Hàng</h2>
+
+              <!-- Tổng quan điểm (ẩn khi chưa có review) -->
+              <div class="reviews-summary" id="reviewsSummary" style="display:none">
+                <div class="reviews-avg-score">
+                  <div class="score" id="avgScore">0</div>
+                  <div class="out-of">/ 5</div>
+                </div>
+                <div>
+                  <div class="reviews-summary-stars" id="summaryStars"></div>
+                  <div class="reviews-summary-count" id="summaryCount"></div>
+                </div>
+              </div>
+
+              <!-- Form gửi đánh giá (chỉ hiện nếu đã đăng nhập) -->
+              <div class="review-form-wrap" id="reviewFormWrap" style="display:none">
+                <div class="review-form-title">✍️ Gửi đánh giá của bạn</div>
+
+                <div class="star-selector" id="starSelector">
+                  <span data-val="1">★</span>
+                  <span data-val="2">★</span>
+                  <span data-val="3">★</span>
+                  <span data-val="4">★</span>
+                  <span data-val="5">★</span>
+                </div>
+                <input type="hidden" id="selectedRating" value="0" />
+
+                <textarea
+                  id="reviewContent"
+                  class="review-textarea"
+                  placeholder="Chia sẻ trải nghiệm của bạn về tour này...">
+                </textarea>
+
+                <button class="btn-submit-review" id="btnSubmitReview" onclick="submitReview()">
+                  Gửi Đánh Giá
+                </button>
+                <div class="review-msg" id="reviewMsg"></div>
+              </div>
+
+              <!-- Thông báo cần đăng nhập (hiện khi chưa đăng nhập) -->
+              <div class="review-login-notice" id="reviewLoginNotice" style="display:none">
+                💬 <a href="login.html">Đăng nhập</a> để viết đánh giá cho tour này.
+              </div>
+
+              <!-- Danh sách đánh giá -->
+              <div class="reviews-list" id="reviewsList">
+                <div class="reviews-empty">Đang tải đánh giá...</div>
+              </div>
+            </section>
 
             <!-- Tour Notes Section (hiển thị cho mọi tour) -->
             <section id="tourNotesSection" class="tour-notes-section"></section>
@@ -1240,28 +1668,81 @@
 
       </div>
 
-      <!-- Success Page -->
+      <!-- Success Page: 2 bước -->
       <div class="success-page" id="successPage">
-        <div class="success-icon">🎉</div>
-        <h2>Đặt Tour Thành Công!</h2>
-        <p>Cảm ơn bạn đã tin tưởng chọn Huế Tour.</p>
-        <p>Chúng tôi sẽ liên hệ xác nhận trong vòng <strong style="color:var(--gold-light)">2 giờ</strong>.</p>
 
-        <div class="booking-code">
-          <div class="label">Mã đặt tour của bạn</div>
-          <span class="code" id="bookingCode">#000</span>
-          <div class="total">Tổng tiền: <strong id="bookingTotal" style="color:var(--gold-light)">–</strong></div>
+        <!-- ── BƯỚC 1: Đặt xong → Hiển thị QR MoMo ── -->
+        <div id="successStep1">
+          <div class="success-icon">✅</div>
+          <h2>Đặt Tour Thành Công!</h2>
+          <p>Mã đặt tour đã được tạo. Vui lòng thanh toán để xác nhận chỗ.</p>
+
+          <div class="booking-code">
+            <div class="label">Mã đặt tour của bạn</div>
+            <span class="code" id="bookingCode">#000</span>
+            <div class="total">Tổng tiền: <strong id="bookingTotal" style="color:var(--gold-light)">–</strong></div>
+          </div>
+
+          <!-- MoMo Payment Box -->
+          <div class="momo-payment-wrap">
+            <div class="momo-payment-header">
+              <span class="momo-logo">💜</span>
+              <span class="momo-payment-title">Thanh Toán MoMo</span>
+            </div>
+
+            <!-- QR Code tự sinh -->
+            <div class="momo-qr-box">
+              <div id="momoQRCode"></div>
+            </div>
+
+            <!-- Thông tin chuyển khoản -->
+            <div class="momo-info-box">
+              <div>📱 <strong>Số MoMo:</strong> <span id="momoPhone"></span></div>
+              <div>👤 <strong>Tên:</strong> <span id="momoName"></span></div>
+              <div>💰 <strong>Số tiền:</strong> <span class="momo-amount-highlight" id="momoAmount"></span></div>
+              <div>📝 <strong>Nội dung CK:</strong> <span id="momoNote" style="font-weight:600;color:#d82d8b"></span></div>
+            </div>
+
+            <p class="momo-note">
+              Quét QR bằng app MoMo hoặc chuyển khoản theo số trên.<br>
+              <strong>Ghi đúng nội dung</strong> để admin xác nhận nhanh nhất.
+            </p>
+
+            <button class="btn-momo-confirm" id="btnMomoPaid" onclick="confirmMomoPaid()">
+              ✅ Tôi Đã Chuyển Khoản
+            </button>
+            <div class="momo-paid-msg" id="momoPaidMsg"></div>
+          </div>
+
+          <p style="color:var(--gray); font-size:0.8rem; margin-top:1.5rem">
+            📞 Hotline: <strong style="color:var(--white)">0234 567 890</strong>
+          </p>
         </div>
 
-        <p style="color:var(--gray); font-size:0.85rem;">
-          📞 Hotline: <strong style="color:var(--white)">0234 567 890</strong> &nbsp;|&nbsp;
-          📧 <strong style="color:var(--white)">info@hue-tour.vn</strong>
-        </p>
+        <!-- ── BƯỚC 2: Sau khi nhấn "Đã chuyển khoản" ── -->
+        <div class="success-step2" id="successStep2">
+          <div class="step2-icon">💜</div>
+          <h2>Cảm Ơn Bạn!</h2>
+          <div class="step2-badge">⏳ Chờ Admin Xác Nhận</div>
+          <p>Chúng tôi sẽ kiểm tra thanh toán và gửi email xác nhận.</p>
+          <p>Thường trong <strong style="color:var(--gold-light)">30 phút</strong> trong giờ hành chính.</p>
 
-        <div class="success-actions">
-          <a href="index.html" class="btn-primary">← Về Trang Chủ</a>
-          <a href="index.html#all-tours" class="btn-outline">Xem Tour Khác</a>
+          <div class="booking-code" style="margin:1.5rem auto">
+            <div class="label">Mã đặt tour</div>
+            <span class="code" id="bookingCode2">#000</span>
+            <div class="total">Tổng tiền: <strong id="bookingTotal2" style="color:var(--gold-light)">–</strong></div>
+          </div>
+
+          <p style="color:var(--gray); font-size:0.8rem; margin-bottom:1.5rem">
+            📧 Email xác nhận sẽ được gửi đến hộp thư của bạn
+          </p>
+
+          <div class="success-actions">
+            <a href="index.html" class="btn-primary">← Về Trang Chủ</a>
+            <a href="index.html#all-tours" class="btn-outline">Xem Tour Khác</a>
+          </div>
         </div>
+
       </div>
 
     </div>
@@ -1274,6 +1755,16 @@
       const redirect = 'booking.html' + window.location.search + window.location.hash;
       window.location.replace('login.html?redirect=' + encodeURIComponent(redirect));
     }
+
+    // ===== CẤU HÌNH MOMO (thay bằng thông tin thật của bạn) =====
+    const MOMO_CONFIG = {
+      phone: '0901234567',                // ← SĐT MoMo của bạn
+      name:  'NGUYEN THI KHANH QUYNH',   // ← Tên tài khoản MoMo (IN HOA)
+    };
+
+    // Biến lưu trạng thái booking hiện tại
+    let _currentBookingId  = null;
+    let _currentTotalPrice = null;
 
     // ===== DỮ LIỆU TOUR (khớp với database Railway và index.html) =====
     // ===== GIỚI THIỆU TOUR (Description) =====
@@ -2125,6 +2616,7 @@
     updatePrice();      // ← Chạy trước để giá luôn đúng
     initDatePicker();   // ← Chạy sau, nếu lỗi cũng không ảnh hưởng giá
     renderTourDescription(tourId);  // ← Hiển thị phần giới thiệu tour (nếu có)
+    initReviews();      // ← Load và khởi tạo phần đánh giá
 
     // ===== TÍNH TIỀN =====
     function formatPrice(n) {
@@ -2261,12 +2753,11 @@
         }
 
         if (res.ok && result.booking_id) {
-          // Hiện trang thành công
+          // Ẩn form booking
           document.getElementById('bookingContent').style.display = 'none';
-          const successPage = document.getElementById('successPage');
-          successPage.style.display = 'block';
-          document.getElementById('bookingCode').textContent = '#' + String(result.booking_id).padStart(4, '0');
-          document.getElementById('bookingTotal').textContent = formatPrice(result.total_price);
+          // Hiện success page và QR MoMo
+          document.getElementById('successPage').style.display = 'block';
+          showMoMoPayment(result.booking_id, result.total_price);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           throw new Error(result.error || 'Lỗi không xác định');
@@ -2278,6 +2769,273 @@
         btn.innerHTML = 'Xác Nhận Đặt Tour';
       }
     });
+
+    // ═══════════════════════════════════════════════════
+    // ===== MOMO PAYMENT =====
+    // ═══════════════════════════════════════════════════
+
+    function showMoMoPayment(bookingId, totalPrice) {
+      _currentBookingId  = bookingId;
+      _currentTotalPrice = totalPrice;
+
+      const codeStr  = '#' + String(bookingId).padStart(4, '0');
+      const noteStr  = 'HUETOUR ' + codeStr;
+
+      // Điền thông tin vào success step 1
+      document.getElementById('bookingCode').textContent  = codeStr;
+      document.getElementById('bookingTotal').textContent = formatPrice(totalPrice);
+      document.getElementById('momoPhone').textContent    = MOMO_CONFIG.phone;
+      document.getElementById('momoName').textContent     = MOMO_CONFIG.name;
+      document.getElementById('momoAmount').textContent   = formatPrice(totalPrice);
+      document.getElementById('momoNote').textContent     = noteStr;
+
+      // Tạo QR code với MoMo deeplink
+      const momoDeeplink =
+        'momo://transfer?phone=' + MOMO_CONFIG.phone +
+        '&amount=' + totalPrice +
+        '&remark=' + encodeURIComponent(noteStr);
+
+      const qrContainer = document.getElementById('momoQRCode');
+      qrContainer.innerHTML = '';   // Xóa QR cũ nếu có
+
+      new QRCode(qrContainer, {
+        text:          momoDeeplink,
+        width:         180,
+        height:        180,
+        colorDark:     '#d82d8b',  // Màu tím MoMo
+        colorLight:    '#ffffff',
+        correctLevel:  QRCode.CorrectLevel.M
+      });
+
+      // Hiển thị Step 1, ẩn Step 2
+      document.getElementById('successStep1').style.display = 'block';
+      document.getElementById('successStep2').style.display = 'none';
+    }
+
+    async function confirmMomoPaid() {
+      const btn = document.getElementById('btnMomoPaid');
+      const msg = document.getElementById('momoPaidMsg');
+
+      if (!_currentBookingId) return;
+
+      btn.disabled    = true;
+      btn.textContent = '⏳ Đang gửi...';
+      msg.textContent = '';
+
+      try {
+        const res = await fetch('/api/payment-momo', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            booking_id:    _currentBookingId,
+            transfer_note: 'HUETOUR #' + String(_currentBookingId).padStart(4, '0')
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          // Chuyển sang Step 2
+          const codeStr = '#' + String(_currentBookingId).padStart(4, '0');
+          document.getElementById('bookingCode2').textContent  = codeStr;
+          document.getElementById('bookingTotal2').textContent = formatPrice(_currentTotalPrice);
+
+          document.getElementById('successStep1').style.display = 'none';
+          document.getElementById('successStep2').style.display = 'block';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          throw new Error(data.error || 'Lỗi không xác định');
+        }
+
+      } catch (err) {
+        msg.style.color = '#e74c3c';
+        msg.textContent = '❌ ' + err.message + ' — Vui lòng thử lại.';
+        btn.disabled    = false;
+        btn.textContent = '✅ Tôi Đã Chuyển Khoản';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // ===== CHỨC NĂNG ĐÁNH GIÁ TOUR =====
+    // ═══════════════════════════════════════════════════
+
+    function initReviews() {
+      // Hiển thị form hoặc thông báo đăng nhập
+      if (CUSTOMER_TOKEN) {
+        document.getElementById('reviewFormWrap').style.display = 'block';
+      } else {
+        document.getElementById('reviewLoginNotice').style.display = 'block';
+      }
+
+      // Khởi tạo star selector
+      const stars = document.querySelectorAll('#starSelector span');
+      stars.forEach(star => {
+        // Hover effect
+        star.addEventListener('mouseover', () => {
+          highlightStars(parseInt(star.dataset.val), false);
+        });
+        // Reset khi rời chuột
+        star.addEventListener('mouseleave', () => {
+          const current = parseInt(document.getElementById('selectedRating').value) || 0;
+          highlightStars(current, true);
+        });
+        // Chọn sao khi click
+        star.addEventListener('click', () => {
+          const val = parseInt(star.dataset.val);
+          document.getElementById('selectedRating').value = val;
+          highlightStars(val, true);
+        });
+      });
+
+      // Reset stars về trạng thái ban đầu (chưa chọn)
+      highlightStars(0, true);
+
+      // Load danh sách đánh giá từ API
+      loadReviews();
+    }
+
+    function highlightStars(val, isLocked) {
+      const stars = document.querySelectorAll('#starSelector span');
+      stars.forEach(s => {
+        const starVal = parseInt(s.dataset.val);
+        if (starVal <= val) {
+          s.classList.add('active');
+          s.style.color = '#f5a623';
+        } else {
+          s.classList.remove('active');
+          s.style.color = isLocked ? '#444' : '#ccc';
+        }
+      });
+    }
+
+    async function loadReviews() {
+      const list = document.getElementById('reviewsList');
+      const summary = document.getElementById('reviewsSummary');
+
+      try {
+        const res = await fetch('/api/reviews?tour_id=' + tourId);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+
+        // Cập nhật summary
+        if (data.total > 0) {
+          summary.style.display = 'flex';
+          document.getElementById('avgScore').textContent = data.average;
+          document.getElementById('summaryStars').textContent = renderStarsText(parseFloat(data.average));
+          document.getElementById('summaryCount').textContent = data.total + ' lượt đánh giá';
+        } else {
+          summary.style.display = 'none';
+        }
+
+        // Hiển thị danh sách
+        if (data.reviews.length === 0) {
+          list.innerHTML = '<div class="reviews-empty">Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ trải nghiệm!</div>';
+          return;
+        }
+
+        list.innerHTML = data.reviews.map(r => `
+          <div class="review-card">
+            <div class="review-card-header">
+              <span class="review-author">👤 ${escapeHtml(r.author)}</span>
+              <span class="review-date">${formatDateReview(r.created_at)}</span>
+            </div>
+            <div class="review-stars">${renderStarsText(r.rating)}</div>
+            ${r.content ? `<div class="review-content">${escapeHtml(r.content)}</div>` : ''}
+          </div>
+        `).join('');
+
+      } catch (err) {
+        list.innerHTML = '<div class="reviews-empty" style="color:#e74c3c">Không thể tải đánh giá. Vui lòng thử lại sau.</div>';
+      }
+    }
+
+    async function submitReview() {
+      const rating  = parseInt(document.getElementById('selectedRating').value);
+      const content = document.getElementById('reviewContent').value.trim();
+      const btn     = document.getElementById('btnSubmitReview');
+      const msg     = document.getElementById('reviewMsg');
+
+      // Validate
+      if (!rating || rating < 1) {
+        msg.style.color = '#e74c3c';
+        msg.textContent = '⚠ Vui lòng chọn số sao trước khi gửi!';
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = '⏳ Đang gửi...';
+      msg.textContent = '';
+
+      try {
+        const res = await fetch('/api/reviews', {
+          method:  'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': 'Bearer ' + CUSTOMER_TOKEN
+          },
+          body: JSON.stringify({
+            tour_id: tourId,
+            rating:  rating,
+            content: content
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          msg.style.color = '#2ecc71';
+          msg.textContent = '✅ Cảm ơn bạn đã đánh giá! Đánh giá sẽ hiển thị ngay bây giờ.';
+          // Reset form
+          document.getElementById('selectedRating').value = '0';
+          document.getElementById('reviewContent').value  = '';
+          highlightStars(0, true);
+          // Ẩn form, reload danh sách
+          document.getElementById('reviewFormWrap').style.display = 'none';
+          loadReviews();
+        } else if (res.status === 401) {
+          msg.style.color = '#e74c3c';
+          msg.textContent = '⚠ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+          btn.disabled    = false;
+          btn.textContent = 'Gửi Đánh Giá';
+        } else if (res.status === 409) {
+          msg.style.color = '#f39c12';
+          msg.textContent = '⚠ Bạn đã đánh giá tour này rồi.';
+          document.getElementById('reviewFormWrap').style.display = 'none';
+          btn.disabled    = false;
+          btn.textContent = 'Gửi Đánh Giá';
+        } else {
+          throw new Error(data.error || 'Lỗi không xác định');
+        }
+
+      } catch (err) {
+        msg.style.color = '#e74c3c';
+        msg.textContent = '❌ Gửi thất bại: ' + err.message;
+        btn.disabled    = false;
+        btn.textContent = 'Gửi Đánh Giá';
+      }
+    }
+
+    // ── Helpers ────────────────────────────────────────────
+    function renderStarsText(rating) {
+      const full  = Math.round(rating);
+      const empty = 5 - full;
+      return '★'.repeat(full) + '☆'.repeat(empty);
+    }
+
+    function formatDateReview(isoStr) {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
   </script>
 
 </body>
