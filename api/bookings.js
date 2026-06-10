@@ -393,6 +393,11 @@ module.exports = async (req, res) => {
     let customer_id;
     if (customerResult.rows.length > 0) {
       customer_id = customerResult.rows[0].id;
+      // Cập nhật tên + email mới nhất — tránh admin thấy tên cũ từ lần test trước
+      await pool.query(
+        'UPDATE customers SET full_name = $1, email = $2 WHERE id = $3',
+        [full_name, email, customer_id]
+      );
     } else {
       const newCustomer = await pool.query(
         'INSERT INTO customers (full_name, phone, email) VALUES ($1,$2,$3) RETURNING id',
