@@ -23,15 +23,24 @@ module.exports = async (req, res) => {
     return res.status(401).json({ error: 'Chưa đăng nhập' });
 
   try {
-    // Tổng quan
+    // Tổng quan — khớp cả status tiếng Anh lẫn tiếng Việt + pending_payment mới
     const overview = await pool.query(`
       SELECT
-        COUNT(*) FILTER (WHERE status != 'Đã huỷ') AS total_bookings,
-        COUNT(*) FILTER (WHERE status = 'Chờ xác nhận') AS pending,
-        COUNT(*) FILTER (WHERE status = 'Đã xác nhận') AS confirmed,
-        COUNT(*) FILTER (WHERE status = 'Đã huỷ') AS cancelled,
-        COALESCE(SUM(total_price) FILTER (WHERE status = 'Đã xác nhận'), 0) AS total_revenue,
-        COALESCE(SUM(num_adults + num_children) FILTER (WHERE status != 'Đã huỷ'), 0) AS total_guests
+        COUNT(*) FILTER (WHERE status NOT IN ('cancelled', 'Đã huỷ')) AS total_bookings,
+
+        COUNT(*) FILTER (WHERE status IN ('pending', 'Chờ xác nhận', 'pending_payment')) AS pending,
+
+        COUNT(*) FILTER (WHERE status IN ('confirmed', 'Đã xác nhận', 'Hoàn thành')) AS confirmed,
+
+        COUNT(*) FILTER (WHERE status IN ('cancelled', 'Đã huỷ')) AS cancelled,
+
+        COALESCE(
+          SUM(total_price) FILTER (WHERE status IN ('confirmed', 'Đã xác nhận', 'Hoàn thành')), 0
+        ) AS total_revenue,
+
+        COALESCE(
+          SUM(num_adults + num_children) FILTER (WHERE status NOT IN ('cancelled', 'Đã huỷ')), 0
+        ) AS total_guests
       FROM bookings
     `);
 
@@ -42,7 +51,7 @@ module.exports = async (req, res) => {
         COUNT(*) AS bookings,
         COALESCE(SUM(total_price), 0) AS revenue
       FROM bookings
-      WHERE status != 'Đã huỷ'
+      WHERE status NOT IN ('cancelled', 'Đã huỷ')
         AND created_at >= NOW() - INTERVAL '6 months'
       GROUP BY TO_CHAR(created_at, 'MM/YYYY'), DATE_TRUNC('month', created_at)
       ORDER BY DATE_TRUNC('month', created_at)
@@ -55,7 +64,7 @@ module.exports = async (req, res) => {
              COALESCE(SUM(b.total_price), 0) AS revenue
       FROM bookings b
       JOIN tours t ON b.tour_id = t.id
-      WHERE b.status != 'Đã huỷ'
+      WHERE b.status NOT IN ('cancelled', 'Đã huỷ')
       GROUP BY t.id, t.title, t.category
       ORDER BY total_bookings DESC
       LIMIT 5

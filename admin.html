@@ -626,6 +626,13 @@ function showAdmin() {
   renderCalendar();
 }
 
+// ── HELPERS ───────────────────────────────────────────────
+// ⚠ Khai báo authHeaders TRƯỚC khi gọi showAdmin()
+const authHeaders = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN });
+
+function formatPrice(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+function formatDate(d)  { if (!d) return '–'; return new Date(d).toLocaleDateString('vi-VN'); }
+
 // Nếu đã có token, tự vào admin
 if (TOKEN) showAdmin();
 
@@ -634,14 +641,12 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
 });
 
-// ── HELPERS ───────────────────────────────────────────────
-const authHeaders = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN });
-
-function formatPrice(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
-function formatDate(d)  { if (!d) return '–'; return new Date(d).toLocaleDateString('vi-VN'); }
-
 function statusBadge(s) {
   const map = { 'Chờ xác nhận': 'pending', 'Đã xác nhận': 'confirm', 'Đã huỷ': 'cancel', 'Hoàn thành': 'done' };
+  if (s === 'pending_payment') return `<span class="badge badge-pending">💜 Chờ xác nhận TT</span>`;
+  if (s === 'pending')         return `<span class="badge badge-pending">⏳ Chờ xử lý</span>`;
+  if (s === 'confirmed')       return `<span class="badge badge-confirm">✅ Đã xác nhận</span>`;
+  if (s === 'cancelled')       return `<span class="badge badge-cancel">❌ Đã huỷ</span>`;
   return `<span class="badge badge-${map[s] || 'pending'}">${s}</span>`;
 }
 
