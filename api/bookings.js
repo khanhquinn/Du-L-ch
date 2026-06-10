@@ -6,8 +6,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// ═══════════════════════ TOUR ITINERARIES ═══════════════════════
-// Đồng bộ với TOUR_ITINERARIES trong booking.html
 const TOUR_ITINERARIES = {
   1: {
     days: [
